@@ -4,7 +4,6 @@
 
  html使用了Vue.js和Vant组件。
 
-##截图
  ![image](https://github.com/pinepalm/Clipboard/raw/master/ScreenShot1.png)
  ![image](https://github.com/pinepalm/Clipboard/raw/master/ScreenShot2.png)
  ![image](https://github.com/pinepalm/Clipboard/raw/master/ScreenShot3.png)
