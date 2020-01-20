@@ -1,0 +1,407 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+    <title>ClipboardUI</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <style type="text/css">
+        .topCtrl {
+            margin: auto 5px auto 0px;
+            cursor: pointer;
+        }
+
+            .topCtrl:hover {
+                color: deepskyblue;
+            }
+
+        .sliderButton {
+            width: 26px;
+            color: #fff;
+            font-size: 10px;
+            line-height: 18px;
+            text-align: center;
+            background-color: deepskyblue;
+            border-radius: 100px;
+        }
+
+        .textStyle {
+            font-size: 18px;
+            cursor: default;
+        }
+
+        .divStyle {
+            margin-left: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script type="text/javascript" src="vue.min.js"></script>
+    <script type="text/javascript" src="vant.min.js"></script>
+</head>
+
+<body style="-webkit-font-smoothing: antialiased;">
+    <div id="vuediv">
+        <van-popup id="settingPopup"
+                   v-model="settingShow"
+                   position="left"
+                   onselectstart="return false;"
+                   :style="{background:'white',width: '75%',height: '100%', cursor: 'default' }">
+            <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }">
+                {{ textShow[0] }}
+            </van-divider>
+            <div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[1] }}</div>
+                    <van-switch v-model="settings.Speech[0]" @change="onChangeSpeech"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[2] }}</div>
+                    <van-switch v-model="settings.Speech[1]" :disabled="!settings.Speech[0]" @change="onChangeSpeechTop"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[3] }}</div>
+                    <van-switch v-model="settings.Speech[2]" :disabled="!settings.Speech[0]" @change="onChangeSpeechEdit"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[4] }}</div>
+                    <van-switch v-model="settings.Speech[3]" :disabled="!settings.Speech[0]" @change="onChangeSpeechCopy"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[5] }}</div>
+                    <van-switch v-model="settings.Speech[4]" :disabled="!settings.Speech[0]" @change="onChangeSpeechIgnore"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[6] }}</div>
+                    <van-switch v-model="settings.Speech[5]" :disabled="!settings.Speech[0]" @change="onChangeSpeechClearall"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[7] }}</div>
+                    <van-switch v-model="settings.Speech[6]" :disabled="!settings.Speech[0]" @change="onChangeSpeechSetting"></van-switch>
+                </div>
+            </div>
+            <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }">
+                {{ textShow[8] }}
+            </van-divider>
+            <div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[9] }}</div>
+                    <van-switch v-model="settings.IsTop"
+                                @change="onChangeIsTop"></van-switch>
+                </div>
+                <div class="divStyle">
+                    <div class="textStyle">{{ textShow[10] }}</div>
+                    <van-tag type="primary"
+                             size="large"
+                             @click="onLanguageClick">{{ languages[settings.Language] }}</van-tag>
+                </div>
+                <div>
+                    <div class="textStyle" style="margin-left:15px;">{{ textShow[11] }}</div>
+                    <div style="margin: 10px 15px;cursor: pointer;">
+                        <van-slider v-model="settings.Opacity"
+                                    bar-height="4px"
+                                    active-color="deepskyblue"
+                                    @change="onSliderChange"
+                                    @input="onSliderInput">
+                            <div slot="button"
+                                 class="sliderButton">
+                                {{ settings.Opacity }}
+                            </div>
+                        </van-slider>
+                    </div>
+                </div>
+            </div>
+            <transition name="van-fade">
+                <van-picker v-show="languageShow"
+                            show-toolbar
+                            :cancel-button-text="textShow[29]"
+                            :confirm-button-text="textShow[30]"
+                            :title="textShow[12]"
+                            :default-index="settings.Language"
+                            :columns="languages"
+                            @cancel="onLanguageCancel"
+                            @confirm="onLanguageConfirm"></van-picker>
+            </transition>
+        </van-popup>
+        <van-popup id="editPopup"
+                   v-model="editShow"      
+                   round
+                   position="bottom"
+                   :style="{ height: '40%' }">
+            <van-field v-model="editText"
+                       type="textarea"
+                       :rows="row">
+                <div slot="label">
+                    <div style="display:flex;">
+                        <van-icon name="records" size="22"></van-icon>
+                        <div style="margin-left:5px;font-size:18px;">{{ textShow[16] }}</div>
+                    </div>
+                    <div style="position: absolute;bottom: 0;">
+                        <van-button size="small" type="primary" @click="onEditOkClick">{{ textShow[38] }}</van-button>
+                    </div>
+                </div>
+            </van-field>
+        </van-popup>
+        <div style="display: flex;">
+            <div style="width: 100%;">
+                <form action="/">
+                    <van-search v-model="value"
+                                :placeholder="textShow[13]"
+                                shape="round"
+                                @search="onSearch"
+                                @input="onInput"></van-search>
+                </form>
+            </div>
+            <div class="topCtrl" :title="textShow[14]">
+                <van-icon name="delete"
+                          size="30"
+                          @click="onClear"
+                          v-if="content.length != 0"></van-icon>
+            </div>
+            <div class="topCtrl" :title="textShow[15]">
+                <van-icon name="setting-o"
+                          size="30"
+                          @click="onSetting"></van-icon>
+            </div>
+        </div>
+        <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }" v-show="mode == 1 ? true : false">
+            {{ rcNum }} {{ textShow[31] }}
+        </van-divider>
+        <van-panel v-for="(item,index) in getContent" v-if="item.lock" :title="textShow[item.type]" desc="" :status="item.time" icon="description">
+            <div style="padding-left: 18px; " class="van-multi-ellipsis--l3">{{ item.text }}</div>
+            <div slot="footer" style="display: flex; justify-content: space-between;">
+                <div style="display: flex;">
+                    <van-button :id="item.id"
+                                round size="small"
+                                color="#7232dd"
+                                icon="records"
+                                @click="onEditClick"
+                                onmousedown="lockDown(event)"
+                                onmouseup="lockUp(event)">{{ textShow[16] }}/{{ textShow[36] }}</van-button>
+                    <div style="margin:auto 4px;color:orangered;">
+                        <van-icon name="star" size="22"></van-icon>
+                    </div>
+                </div>
+                <div>
+                    <van-button :id="item.id" round size="small" type="primary" style="margin-right:3px;" @click="onCopyClick">{{ textShow[17] }}</van-button>
+                    <van-button :id="item.id" round size="small" type="info" @click="onIgnoreClick">{{ textShow[18] }}</van-button>
+                </div>
+            </div>
+        </van-panel>
+        <van-panel v-for="(item,index) in getContent" v-if="!item.lock" :title="textShow[item.type]" desc="" :status="item.time" icon="description">
+            <div style="padding-left: 18px; " class="van-multi-ellipsis--l3">{{ item.text }}</div>
+            <div slot="footer" style="display: flex; justify-content: space-between;">
+                <van-button :id="item.id"
+                            round size="small"
+                            color="#7232dd"
+                            icon="records"
+                            @click="onEditClick"
+                            onmousedown="lockDown(event)"
+                            onmouseup="lockUp(event)">{{ textShow[16] }}/{{ textShow[35] }}</van-button>
+                <div>
+                    <van-button :id="item.id" round size="small" type="primary" style="margin-right:3px;" @click="onCopyClick">{{ textShow[17] }}</van-button>
+                    <van-button :id="item.id" round size="small" type="info" @click="onIgnoreClick">{{ textShow[18] }}</van-button>
+                </div>
+            </div>
+        </van-panel>
+    </div>
+    <script type="text/javascript">
+        var dataset = new Vue({
+            el: '#vuediv',
+            data: {
+                content: [],
+                mode: 0,
+                rcNum: 0,
+                value: "",
+                row: 0,
+                settings: {
+                    Speech:
+                        [true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true,
+                            true],
+                    IsTop: true,
+                    Opacity: 100,
+                    Language: 0
+                },
+                settingShow: false,
+                languageShow: false,
+                editShow: false,
+                editId: 0,
+                editText: "",
+                languages: ["简体中文(中国)",
+                    "繁體中文(中國臺灣)",
+                    "繁體中文(中國香港)",
+                    "English(HK)",
+                    "English(US)",
+                    "English(UK)"
+                ],
+                textShow: [
+                    
+                ]
+            },
+            mounted: function () {
+                this.settings = JSON.parse(window.getCommand1(7));
+                this.content = JSON.parse(window.getCommand1(9));
+                this.textShow = JSON.parse(window.getCommand1(8));
+            },
+            computed: {
+                getContent: function() {
+                    switch (this.mode) {
+                        case 0:  //normal
+                            return JSON.parse(JSON.stringify(this.content)).reverse();
+                        case 1:  //search
+                            let temp = [];
+                            for (let tp of this.content) {
+                                if (tp.text.indexOf(this.value) != -1) {
+                                    temp.push(tp);
+                                }
+                            }
+                            this.rcNum = temp.length;
+                            return temp.reverse();
+                        default:
+                            return JSON.parse(JSON.stringify(this.content)).reverse();
+                    } 
+                }
+            },
+            methods: {
+                onSearch: function (value) {
+                    if (value.length != 0) {
+                        this.mode = 1;
+                    } 
+                },
+                onInput: function (value) {
+                    this.mode = (value.length == 0 ? 0 : 1);
+                },
+                onClear: function () {
+                    window.getCommand1(5);
+                    this.content.splice(0, this.content.length);
+                },
+                onSetting: function () {
+                    this.settingShow = true;
+                    window.getCommand1(6);
+                },
+                onEditClick: function (event) {
+                    this.editId = parseInt(event.target.id);
+                    this.editText = this.content[this.editId].text;
+                    this.editShow = true;
+                    window.getCommand2(2, this.editId);
+                },
+                onEditOkClick: function (event) {
+                    this.content[this.editId].text = this.editText;              
+                    window.getCommand3(11, this.editId, this.editText);
+                    this.editShow = false;
+                },
+                onCopyClick: function (event) {
+                    let index = parseInt(event.target.id);
+                    window.getCommand2(0, index);
+                    vant.Toast.success(this.textShow[19]);
+                },
+                onIgnoreClick: function (event) {
+                    let index = parseInt(event.target.id);
+                    window.getCommand2(1, index);
+                    this.content.splice(index, 1);
+                    for (let i = index; i < this.content.length; i++) {
+                        this.content[i].id = i.toString();
+                    }
+                },
+                onChangeSpeech: function (checked) {
+                    window.getCommand3(10, 0, checked ? 1 : 0);
+                },
+                onChangeSpeechTop: function (checked) {
+                    window.getCommand3(10, 1, checked ? 1 : 0);
+                },
+                onChangeSpeechEdit: function (checked) {
+                    window.getCommand3(10, 2, checked ? 1 : 0);
+                },
+                onChangeSpeechCopy: function (checked) {
+                    window.getCommand3(10, 3, checked ? 1 : 0);
+                },
+                onChangeSpeechIgnore: function (checked) {
+                    window.getCommand3(10, 4, checked ? 1 : 0);
+                },
+                onChangeSpeechClearall: function (checked) {
+                    window.getCommand3(10, 5, checked ? 1 : 0);
+                },
+                onChangeSpeechSetting: function (checked) {
+                    window.getCommand3(10, 6, checked ? 1 : 0);
+                },
+                onChangeIsTop: function (checked) {
+                    window.getCommand3(10, 7, checked ? 1 : 0);
+                },
+                onLanguageClick: function (event) {
+                    dataset.languageShow = true;
+                    setTimeout(function () {
+                        let settingPopup = document.getElementById("settingPopup");
+                        settingPopup.scrollTop = settingPopup.scrollHeight;
+                    },10);
+                },
+                onSliderChange: function (value) {
+                    window.getCommand3(10, 8, value);
+                },
+                onSliderInput: function (value) {
+                    window.getCommand2(3, value);
+                },
+                onLanguageConfirm: function (value, index) {
+                    window.getCommand3(10, 9, index);
+                    this.textShow = JSON.parse(window.getCommand1(8));
+                    dataset.settings.Language = index;
+                    dataset.languageShow = false;
+                },
+                onLanguageCancel() {
+                    dataset.languageShow = false;
+                }
+            }
+        })
+        var timeStart, timeEnd, time;
+        function getTimeNow() {
+            var now = new Date();
+            return now.getTime();
+        }
+        function lockDown(event) {  
+            timeStart = getTimeNow();
+            time = setInterval(function () {
+                timeEnd = getTimeNow();
+                if (timeEnd - timeStart > 1000) {
+                    clearInterval(time);
+                    vant.Dialog.confirm({
+                        cancelButtonText: dataset.textShow[29],
+                        confirmButtonText: dataset.textShow[30],
+                        title: dataset.textShow[32],
+                        message: dataset.textShow[33 + (dataset.content[parseInt(event.target.id)].lock ? 1 : 0)]
+                    }).then(() => {
+                        let index = parseInt(event.target.id);
+                        window.getCommand2(4, index);
+                        dataset.content[index].lock = !dataset.content[index].lock;
+                    }).catch(() => {
+
+                    });
+                }
+            }, 100);
+        }
+        function lockUp(event) {
+            clearInterval(time);
+        }
+        function notify(type, msg) {
+            dataset.settings.IsTop = (msg == dataset.textShow[20]);
+            vant.Notify({
+                type: type,
+                message: msg,
+                duration: 2000
+            });
+        }
+        function add(tag) {
+            dataset.content.push(JSON.parse(tag));
+        }
+        window.onload = function () {
+            dataset.row = Math.floor(window.innerHeight * 0.4 / 26);
+        }
+        window.onresize = function () {
+            dataset.row = Math.floor(window.innerHeight * 0.4 / 26);
+        }
+    </script>
+</body>
+</html>
