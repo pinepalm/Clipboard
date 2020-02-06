@@ -45,6 +45,19 @@
     End Property
 
     ''' <summary>
+    ''' 语言种类名
+    ''' </summary>
+    ''' <remarks></remarks>
+    Friend Shared LanguageType As String() = {
+        "简体中文(中国)",
+        "繁體中文(中國臺灣)",
+        "繁體中文(中國香港)",
+        "English(HK)",
+        "English(US)",
+        "English(UK)"
+    }
+
+    ''' <summary>
     ''' 不同语言对应的文字列表
     ''' </summary>
     ''' <remarks></remarks>

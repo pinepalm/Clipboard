@@ -102,6 +102,9 @@ Public Class MainForm
             Case CommandName.AddPre
                 Return JsValue.StringValue(jsExecState, Object2Json(DataList))
 
+            Case CommandName.LanguageType
+                Return JsValue.StringValue(jsExecState, Object2Json(LanguageType))
+
             Case Else
                 Return JsValue.UndefinedValue
 

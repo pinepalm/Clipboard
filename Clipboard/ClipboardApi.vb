@@ -56,6 +56,7 @@ Public Class ClipboardApi
         SettingsJS
         LanguageText
         AddPre
+        LanguageType
 
         SettingsNET
         EditText
