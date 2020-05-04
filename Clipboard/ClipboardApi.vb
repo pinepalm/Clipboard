@@ -10,6 +10,8 @@ Public Class ClipboardApi
 
     Public Const KERNEL32 As String = "Kernel32.dll"
 
+    Public Const SHELL32 As String = "Shell32.dll"
+
     ''' <summary>
     ''' 数据结构
     ''' </summary>
@@ -38,7 +40,59 @@ Public Class ClipboardApi
         Public Language As Language
     End Structure
 
+    <StructLayout(LayoutKind.Sequential)>
+    Public Structure NotifyIconData
+        Public cbSize As Integer
+        Public hWnd As IntPtr
+        Public uID As UInteger
+        Public uFlags As NotifyIconFlag
+        Public uCallbackMessage As UInteger
+        Public hIcon As IntPtr
+        <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=128)>
+        Public szTip As String
+        Public dwState As Integer
+        Public dwStateMask As Integer
+        <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=256)>
+        Public szInfo As String
+        Public uTimeoutOrVersion As UInteger
+        <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=64)>
+        Public szInfoTitle As String
+        Public dwInfoFlags As NotifyIconInfoFlag
+        Public guidItem As Guid
+        Public hBalloonIcon As IntPtr
+    End Structure
+
 #Region "Enum"
+    Public Enum NotifyIconInfoFlag
+        NIIF_NONE = &H0
+        NIIF_INFO = &H1
+        NIIF_WARNING = &H2
+        NIIF_ERROR = &H3
+        NIIF_USER = &H4
+        NIIF_NOSOUND = &H10
+        NIIF_LARGE_ICON = &H20
+        NIIF_RESPECT_QUIET_TIME = &H80
+        NIIF_ICON_MASK = &HF
+    End Enum
+
+    Public Enum NotifyIconFlag As UInteger
+        NIF_MESSAGE = &H1
+        NIF_ICON = &H2
+        NIF_TIP = &H4
+        NIF_STATE = &H8
+        NIF_INFO = &H10
+        NIF_GUID = &H20
+        NIF_REALTIME = &H40
+        NIF_SHOWTIP = &H80
+    End Enum
+
+    Public Enum NotifyIconMessage
+        NIM_ADD = &H0
+        NIM_MODIFY = &H1
+        NIM_DELETE = &H2
+        NIM_SETFOCUS = &H3
+        NIM_SETVERSION = &H4
+    End Enum
 
     ''' <summary>
     ''' 命令名称
@@ -343,6 +397,10 @@ Public Class ClipboardApi
 
     <DllImport(KERNEL32)>
     Public Shared Function WritePrivateProfileString(ByVal lpApplicationName As String, ByVal lpKeyName As String, ByVal lpString As String, ByVal lpFileName As String) As Integer
+    End Function
+
+    <DllImport(SHELL32)>
+    Public Shared Function Shell_NotifyIcon(ByVal dwMessage As NotifyIconMessage, ByRef lpData As NotifyIconData) As Boolean
     End Function
 
 #End Region

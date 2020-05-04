@@ -101,7 +101,9 @@
         "锁定",
         "解锁",
         "灾难性故障！",
-        "完成"
+        "完成",
+        "取消日期选择",
+        "日期选择"
         },
         New String() {
         "語音設置",
@@ -142,7 +144,9 @@
         "鎖定",
         "解鎖",
         "災難性故障！",
-        "完成"
+        "完成",
+        "取消日期選擇",
+        "日期選擇"
         },
         New String() {
         "語音設置",
@@ -183,7 +187,9 @@
         "鎖定",
         "解鎖",
         "災難性故障！",
-        "完成"
+        "完成",
+        "取消日期選擇",
+        "日期選擇"
         },
         New String() {
         "Speech Settings",
@@ -224,7 +230,9 @@
         "Lock",
         "Unlock",
         "Catastrophic failure!",
-        "OK"
+        "OK",
+        "Deselect Date",
+        "Select Date"
         },
         New String() {
         "Speech Settings",
@@ -265,7 +273,9 @@
         "Lock",
         "Unlock",
         "Catastrophic failure!",
-        "OK"
+        "OK",
+        "Deselect Date",
+        "Select Date"
         },
         New String() {
         "Speech Settings",
@@ -306,7 +316,9 @@
         "Lock",
         "Unlock",
         "Catastrophic failure!",
-        "OK"
+        "OK",
+        "Deselect Date",
+        "Select Date"
         }
     }
 

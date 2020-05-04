@@ -35,7 +35,7 @@ Public Class MainForm
         '除了参数命令外，还有两个参数的交互函数
         JsValue.BindFunction("getCommand3", New wkeJsNativeFunction(AddressOf getCommand3), 3)
 
-        ClipboardUI.LoadURL(Path.Combine(Application.StartupPath, "ClipboardUI.html"))
+        ClipboardUI.LoadURL(Path.Combine(Application.StartupPath, "ClipboardUI\ClipboardUI.html"))
     End Sub
 
 #Region "Net -> Js"
@@ -53,14 +53,15 @@ Public Class MainForm
             Return
         End If
 
-        If Windows.Forms.Clipboard.ContainsText Then
+        Dim iData As IDataObject = Windows.Forms.Clipboard.GetDataObject()
+        If iData IsNot Nothing AndAlso iData.GetDataPresent(DataFormats.Text) Then
 
             '判定前一段复制的文本与此时复制的是否相同
-            Dim PreText As String = Windows.Forms.Clipboard.GetText
+            Dim PreText As String = CType(iData.GetData(DataFormats.Text), String)
             If DataList.Count = 0 OrElse Not PreText = DataList.Last.text Then
                 Dim Temp As New DataTag With {
                                     .type = 21,
-                                    .time = Now.ToString("HH:mm"),
+                                    .time = Now.ToString("yyyy/MM/dd HH:mm"),
                                     .text = PreText,
                                     .id = DataList.Count.ToString,
                                     .lock = False

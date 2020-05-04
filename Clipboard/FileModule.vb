@@ -160,7 +160,7 @@ Module FileModule
         Catch ex As Exception
             LogRecord(ex.Message)
             MessageBox.Show(SpecText(37), MainForm.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            MainForm.Close()
+            Application.Exit()
         End Try
     End Sub
 

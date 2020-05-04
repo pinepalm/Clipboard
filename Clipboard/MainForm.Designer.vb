@@ -82,7 +82,6 @@ Partial Class MainForm
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MinimumSize = New System.Drawing.Size(500, 809)
         Me.Name = "MainForm"
-        Me.ShowInTaskbar = False
         Me.Text = "Clipboard"
         Me.IconContextMenuStrip.ResumeLayout(False)
         Me.ResumeLayout(False)

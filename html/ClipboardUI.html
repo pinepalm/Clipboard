@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
     <title>ClipboardUI</title>
     <link rel="stylesheet" type="text/css" href="index.css">
-    <link rel="stylesheet" type="text/css" href="ClipboardUI.css">
+    <link rel="stylesheet" type="text/css" href="Segoe-MDL2-Assets.css">
+    <link rel="stylesheet" type="text/css" href="ClipboardUI.css">   
     <script type="text/javascript" src="vue.min.js"></script>
-    <script type="text/javascript" src="vant.min.js"></script>
+    <script type="text/javascript" src="vant.min.js"></script>   
 </head>
 
-<body style="-webkit-font-smoothing: antialiased;">
+<body style="-webkit-font-smoothing: antialiased; font-family: 'Microsoft YaHei',Arial,Helvetica,sans-serif,'宋体';">
     <div id="vuediv">
         <van-popup id="settingPopup"
                    v-model="settingShow"
@@ -104,7 +105,7 @@
                        :rows="row">
                 <div slot="label">
                     <div style="display:flex;">
-                        <van-icon name="records" size="22"></van-icon>
+                        <van-icon class-prefix="mdl2" name="edit" size="22"></van-icon>
                         <div style="margin-left:5px;font-size:18px;">{{ textShow[16] }}</div>
                     </div>
                     <div style="position: absolute;bottom: 0;">
@@ -113,32 +114,80 @@
                 </div>
             </van-field>
         </van-popup>
-        <div style="display: flex;">
-            <div style="width: 100%;">
-                <form action="/">
-                    <van-search v-model="value"
-                                :placeholder="textShow[13]"
-                                shape="round"
-                                @search="onSearch"
-                                @input="onInput"></van-search>
-                </form>
+        <van-calendar v-model="calendarShow"
+                      color="deepskyblue"
+                      type="range"
+                      :confirm-text="textShow[30]"
+                      :confirm-disabled-text="textShow[30]"
+                      :min-date="minDate"
+                      :max-date="maxDate"
+                      allow-same-day
+                      @confirm="onDateSelectConfirm">
+                <div slot="title">
+                    <div style="display: flex; justify-content: center;">
+                        <van-icon class="calendar"
+                                  style="margin: auto -38px auto 18px;"
+                                  class-prefix="mdl2"
+                                  name="calendar-reply"
+                                  :title="textShow[39]"
+                                  @click="onDateSelectCancel"></van-icon>             
+                        <div style="margin: 0px auto; text-align: center;">{{ textShow[40] }}</div>
+                    </div>                                                           
+                </div>
+        </van-calendar>
+        <div style="display: flex; flex-direction: column;">
+            <div style="display: flex;">
+                <div style="width: 100%;">
+                    <form action="/">
+                        <van-search v-model="value"
+                                    :placeholder="textShow[13]"
+                                    shape="round"
+                                    @search="onSearch"
+                                    @input="onInput">
+                            <div slot="left-icon">
+                                <van-icon class-prefix="mdl2" name="find-legacy"></van-icon>
+                            </div>
+                            <div slot="right-icon">                               
+                                <van-icon class="calendar"
+                                          class-prefix="mdl2"
+                                          name="calendar"
+                                          :title="textShow[40]"
+                                          @click="onDateSelectShow"></van-icon>                                                             
+                            </div>
+                        </van-search>
+                    </form>
+                </div>
+                <div class="topCtrl" :title="textShow[14]">
+                    <van-icon class-prefix="mdl2"
+                            name="delete"
+                            size="30"
+                            @click="onClear"
+                            v-if="content.length != 0"></van-icon>
+                </div>
+                <div class="topCtrl" :title="textShow[15]">
+                    <van-icon class-prefix="mdl2"
+                            name="settings"
+                            size="30"
+                            @click="onSetting"></van-icon>
+                </div>
             </div>
-            <div class="topCtrl" :title="textShow[14]">
-                <van-icon name="delete"
-                          size="30"
-                          @click="onClear"
-                          v-if="content.length != 0"></van-icon>
-            </div>
-            <div class="topCtrl" :title="textShow[15]">
-                <van-icon name="setting-o"
-                          size="30"
-                          @click="onSetting"></van-icon>
-            </div>
-        </div>
+            <div style="text-align: center; color: deepskyblue;" v-if="calendarDateSelect[0] != null">{{ formatDate(calendarDateSelect[0]) }}-{{ formatDate(calendarDateSelect[1]) }}</div>
+        </div>       
         <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }" v-show="mode == 1 ? true : false">
             {{ rcNum }} {{ textShow[31] }}
         </van-divider>
-        <van-panel v-for="(item,index) in getContent" v-if="item.lock" :title="textShow[item.type]" desc="" :status="item.time" icon="description">
+        <van-panel v-for="(item,index) in getContent"
+                   v-if="item.lock && containDate(item.time)">
+            <div slot="header">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="display: flex;">
+                        <van-icon class-prefix="mdl2" name="characters" size="22" style="margin: 5px 5px 5px 18px;"></van-icon>
+                        <div style="margin: 5px 5px 5px 0px;">{{ textShow[item.type] }}</div>
+                    </div>
+                    <div style="margin: 5px 18px 5px 5px; color: red;">{{ getShowDate(item.time) }}</div>                   
+                </div>             
+                <van-divider style="margin: 0px;"></van-divider>
+            </div>
             <div style="padding-left: 18px; " class="van-multi-ellipsis--l3">{{ item.text }}</div>
             <div slot="footer" style="display: flex; justify-content: space-between;">
                 <div style="display: flex;">
@@ -147,12 +196,13 @@
                                 round
                                 size="small"
                                 color="#7232dd"
-                                icon="records"
+                                icon-prefix="mdl2"
+                                icon="edit"
                                 @click="onEditClick"
                                 onmousedown="lockDown(event)"
                                 onmouseup="lockUp(event)">{{ textShow[16] }}/{{ textShow[36] }}</van-button>
                     <div style="margin:auto 4px;color:orangered;">
-                        <van-icon name="star" size="22"></van-icon>
+                        <van-icon class-prefix="mdl2" name="favorite-star-fill" size="22"></van-icon>
                     </div>
                 </div>
                 <div style="display: flex;">
@@ -162,24 +212,41 @@
                                 size="small"
                                 type="primary"
                                 style="margin-right:3px;"
+                                icon-prefix="mdl2"
+                                icon="copy"
                                 @click="onCopyClick">{{ textShow[17] }}</van-button>
                     <van-button :id="item.id"
                                 class="ripple"
                                 round
                                 size="small"
                                 type="info"
+                                icon-prefix="mdl2"
+                                icon="delete"
                                 @click="onIgnoreClick">{{ textShow[18] }}</van-button>
                 </div>
             </div>
         </van-panel>
-        <van-panel v-for="(item,index) in getContent" v-if="!item.lock" :title="textShow[item.type]" desc="" :status="item.time" icon="description">
+        <van-panel v-for="(item,index) in getContent"
+                   v-if="!item.lock && containDate(item.time)">
+            <div slot="header">
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="display: flex;">
+                        <van-icon class-prefix="mdl2" name="characters" size="22" style="margin: 5px 5px 5px 18px;"></van-icon>
+                        <div style="margin: 5px 5px 5px 0px;">{{ textShow[item.type] }}</div>
+                    </div>
+                    <div style="margin: 5px 18px 5px 5px; color: red;">{{ getShowDate(item.time) }}</div>                   
+                </div>             
+                <van-divider style="margin: 0px;"></van-divider>
+            </div>
             <div style="padding-left: 18px; " class="van-multi-ellipsis--l3">{{ item.text }}</div>
             <div slot="footer" style="display: flex; justify-content: space-between;">
                 <van-button :id="item.id"
                             class="ripple"
-                            round size="small"
+                            round
+                            size="small"
                             color="#7232dd"
-                            icon="records"
+                            icon-prefix="mdl2"
+                            icon="edit"
                             @click="onEditClick"
                             onmousedown="lockDown(event)"
                             onmouseup="lockUp(event)">{{ textShow[16] }}/{{ textShow[35] }}</van-button>
@@ -190,12 +257,16 @@
                                 size="small"
                                 type="primary"
                                 style="margin-right:3px;"
+                                icon-prefix="mdl2"
+                                icon="copy"
                                 @click="onCopyClick">{{ textShow[17] }}</van-button>
                     <van-button :id="item.id"
                                 class="ripple"
                                 round
                                 size="small"
                                 type="info"
+                                icon-prefix="mdl2"
+                                icon="delete"
                                 @click="onIgnoreClick">{{ textShow[18] }}</van-button>
                 </div>
             </div>
