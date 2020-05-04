@@ -67,12 +67,16 @@ var dataset = new Vue({
                     return JSON.parse(JSON.stringify(this.content)).reverse();
                 case 1:  //search
                     let temp = [];
+                    let trueNum = 0;
                     for (let tp of this.content) {
                         if (tp.text.indexOf(this.value) != -1) {
                             temp.push(tp);
+                            if (this.containDate(tp.time)) {
+                                trueNum++;
+                            }
                         }
                     }
-                    this.rcNum = temp.length;
+                    this.rcNum = trueNum;
                     return temp.reverse();
                 default:
                     return JSON.parse(JSON.stringify(this.content)).reverse();
