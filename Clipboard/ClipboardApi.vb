@@ -1,15 +1,12 @@
 ﻿Imports Clipboard.LangClass
-Imports System.Runtime.InteropServices
 Imports System.Text
+Imports System.Runtime.InteropServices
 
 Public Class ClipboardApi
 
     Public Const USER32 As String = "User32.dll"
-
     Public Const SHCORE As String = "SHCore.dll"
-
     Public Const KERNEL32 As String = "Kernel32.dll"
-
     Public Const SHELL32 As String = "Shell32.dll"
 
     ''' <summary>
@@ -30,14 +27,10 @@ Public Class ClipboardApi
     ''' </summary>
     ''' <remarks></remarks>
     Public Structure Settings
-        '0-6
-        Public Speech As Boolean()
-        '7
-        Public IsTop As Boolean
-        '8
-        Public Opacity As Integer
-        '9
-        Public Language As Language
+        Public Speech As Boolean()      '0-6
+        Public IsTop As Boolean         '7
+        Public Opacity As Integer       '8
+        Public Language As Language     '9
     End Structure
 
     <StructLayout(LayoutKind.Sequential)>
@@ -111,6 +104,7 @@ Public Class ClipboardApi
         LanguageText
         AddPre
         LanguageType
+        AddFile
 
         SettingsNET
         EditText
@@ -122,24 +116,17 @@ Public Class ClipboardApi
     ''' <remarks></remarks>
     Public Enum SettingsName
 
-        '语音设置-------------------------------------------------------------------,0-6
+        '语音设置--------------------------------------------------------------------,0-6
         Speech  '-------------------------------------------------------------------,语音总设置
-
         SpeechTop
-
         SpeechEdit
-
         SpeechCopy
-
         SpeechIgnore
-
         SpeechClearall
-
         SpeechSetting
 
         '其它设置-------------------------------------------------------------------,7-8
         IsTop
-
         Opacity
 
         '语言设置-------------------------------------------------------------------,9

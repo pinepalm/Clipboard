@@ -1,19 +1,60 @@
 .topCtrl {
     margin: auto 5px auto 0px;
     cursor: pointer;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -ms-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
 }
 
-    .topCtrl:hover {
-        color: deepskyblue;
-    }
+.topCtrl:hover {
+    color: deepskyblue;
+}
 
 .calendar {
     cursor: pointer;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -ms-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
 }
-    
-    .calendar:hover {
-        color: deepskyblue;
-    }
+
+.calendar:hover {
+    color: deepskyblue;
+}
+
+.searchTypeItem {
+    background-color: inherit;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -ms-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
+}
+
+.searchTypeItem:hover {
+    background-color: skyblue;
+}
+
+.v-enter,
+.v-leave-to {
+    opacity: 0;
+}
+
+.v-enter-active,
+.v-leave-active {
+    transition: all 0.4s ease;
+}
+
+.v-move {
+    transition: all 0.4s ease;
+}
+
+.v-leave-active {
+    position: absolute;
+}
 
 .sliderButton {
     width: 26px;
@@ -43,25 +84,25 @@
     overflow: hidden;
 }
 
-    .ripple:after {
-        content: "";
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        pointer-events: none;
-        background-image: radial-gradient(circle, #666 10%, transparent 10.01%);
-        background-repeat: no-repeat;
-        background-position: 50%;
-        transform: scale(10, 10);
-        opacity: 0;
-        transition: transform .3s, opacity .5s;
-    }
+.ripple:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #666 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform .3s, opacity .5s;
+}
 
-    .ripple:active:after {
-        transform: scale(0, 0);
-        opacity: .3;
-        transition: 0s;
-    }
+.ripple:active:after {
+    transform: scale(0, 0);
+    opacity: .3;
+    transition: 0s;
+}

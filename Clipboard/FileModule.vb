@@ -17,27 +17,61 @@ Module FileModule
     ''' <remarks></remarks>
     Friend Const OtherSec As String = "Other"
 
+    Friend Const TimeFormatter As String = "yyyy/MM/dd HH:mm"
+
     Friend SettingsHelper As INIHelper
 
     '-------------------------------------------------------------------------------
+    Friend Const ImageDataName As String = "ImageData"
+    Friend ImageDataPath As String = Path.Combine(Application.StartupPath, ImageDataName)
+
+    Friend Const ClipboardUIDirName As String = "ClipboardUI"
+    Friend ClipboardUIName As String = $"{ClipboardUIDirName}\ClipboardUI.html"
+    Friend ClipboardUIPath As String = Path.Combine(Application.StartupPath, ClipboardUIName)
 
     Friend Const LogName As String = "Clipboard.log"
-
     Friend LogPath As String = Path.Combine(Application.StartupPath, LogName)
 
     Friend Const ININame As String = "Clipboard.ini"
-
     Friend INIPath As String = Path.Combine(Application.StartupPath, ININame)
 
     Friend Const DATName As String = "Clipboard.dat"
-
     Friend DATPath As String = Path.Combine(Application.StartupPath, DATName)
 
-    Friend ReadOnly Property Time() As String
+    Friend ReadOnly Property Time(Optional ByVal Formatter As String = "yyyy/MM/dd HH:mm:ss") As String
         Get
-            Return Now.ToString("yyyy/MM/dd HH:mm:ss")
+            Return Now.ToString(Formatter)
         End Get
     End Property
+
+    Friend Function GetFileType(ByVal Path As String) As String
+        If File.Exists(Path) Then
+            Return "*41"
+        ElseIf Directory.Exists(path) Then
+            Return "*42"
+        End If
+        Return "*41"
+    End Function
+
+    Private Sub ForEachInEnumerable(Of T)(ByRef Enumerable As IEnumerable(Of T), ByVal Action As Action(Of T))
+        For Each item As T In Enumerable
+            Action(item)
+        Next
+    End Sub
+
+    Friend Sub DeleteFolderContent(ByVal Path As String)
+        If Directory.Exists(Path) Then
+            Dim Temp As New DirectoryInfo(Path)
+            ForEachInEnumerable(Temp.EnumerateFiles(), Sub(F) F.Delete())
+            ForEachInEnumerable(Temp.EnumerateDirectories(), Sub(D) D.Delete(True))
+        End If
+    End Sub
+
+    Friend Sub CheckUiDirectory(ByVal DirectoryName As String, ByVal Action As Action)
+        If Not Directory.Exists(Path.Combine(Application.StartupPath, DirectoryName)) Then
+            Action()
+        End If
+    End Sub
 
 #Region "INI"
 
@@ -181,7 +215,7 @@ Module FileModule
             End If
 
             Using Sw As StreamWriter = New StreamWriter(LogPath, True)
-                Sw.WriteLine(Time & "->" & Msg)
+                Sw.WriteLine($"{Time}->{Msg}")
                 Sw.Flush()
                 Sw.Close()
             End Using

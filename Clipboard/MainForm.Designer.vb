@@ -30,6 +30,7 @@ Partial Class MainForm
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.WebViewPanel = New System.Windows.Forms.Panel()
+        Me.AddFileDialog = New System.Windows.Forms.OpenFileDialog()
         Me.IconContextMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -73,6 +74,11 @@ Partial Class MainForm
         Me.WebViewPanel.Size = New System.Drawing.Size(482, 762)
         Me.WebViewPanel.TabIndex = 1
         '
+        'AddFileDialog
+        '
+        Me.AddFileDialog.Filter = "All files (*.*)|*.*"
+        Me.AddFileDialog.Multiselect = True
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
@@ -94,4 +100,5 @@ Partial Class MainForm
     Friend WithEvents IsTopToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents WebViewPanel As Panel
+    Friend WithEvents AddFileDialog As OpenFileDialog
 End Class

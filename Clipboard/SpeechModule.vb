@@ -1,10 +1,9 @@
-﻿Imports System.Speech.Synthesis
-Imports Clipboard.ClipboardApi
+﻿Imports Clipboard.ClipboardApi
+Imports System.Speech.Synthesis
 
 Module SpeechModule
 
     Friend Speecher As SpeechSynthesizer
-
     Friend SpeechMsg As PromptBuilder
 
     Friend Sub ActionSpeech(ByVal Name As SettingsName, ByVal Msg As String)

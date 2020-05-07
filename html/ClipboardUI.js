@@ -5,29 +5,32 @@ var dataset = new Vue({
         mode: 0,
         rcNum: 0,
         value: "",
+        searchType: 46, //21,41,43,46
         row: 0,
         settings: {
-            Speech:
-                [true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true],
+            Speech: [true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+            ],
             IsTop: true,
             Opacity: 100,
             Language: 0
         },
         settingShow: false,
         languageShow: false,
+        searchTypeShow: false,
         calendarShow: false,
-        calendarDateSelect: [null,null],
+        calendarDateSelect: [null, null],
         minDate: new Date(),
         maxDate: new Date(),
-        editShow: false,     
+        editShow: false,
         editId: 0,
         editText: "",
+        editFile: [],
         languages: [],
         commandName: {
             Copy: 0,
@@ -42,13 +45,21 @@ var dataset = new Vue({
             LanguageText: 8,
             AddPre: 9,
             LanguageType: 10,
+            AddFile: 11,
 
-            SettingsNET: 11,
-            EditText: 12
+            SettingsNET: 12,
+            EditText: 13
         },
         textShow: [
 
-        ]
+        ],
+        iconShow: {
+            21: "characters",
+            41: "document",
+            42: "folder",
+            43: "cloud",
+            46: "view-all"
+        }
     },
     mounted: function () {
         this.settings = JSON.parse(window.getCommand1(this.commandName.SettingsJS));
@@ -63,16 +74,27 @@ var dataset = new Vue({
     computed: {
         getContent: function () {
             switch (this.mode) {
-                case 0:  //normal
+                case 0: //normal
                     return JSON.parse(JSON.stringify(this.content)).reverse();
-                case 1:  //search
+                case 1: //search
                     let temp = [];
                     let trueNum = 0;
-                    for (let tp of this.content) {
-                        if (tp.text.indexOf(this.value) != -1) {
-                            temp.push(tp);
-                            if (this.containDate(tp.time)) {
-                                trueNum++;
+                    if (this.searchType == 46) {
+                        for (let tp of this.content) {
+                            if (tp.text.indexOf(this.value) != -1) {
+                                temp.push(tp);
+                                if (this.containDate(tp.time)) {
+                                    trueNum++;
+                                }
+                            }
+                        }
+                    } else {
+                        for (let tp of this.content) {
+                            if (tp.type == this.searchType && tp.text.indexOf(this.value) != -1) {
+                                temp.push(tp);
+                                if (this.containDate(tp.time)) {
+                                    trueNum++;
+                                }
                             }
                         }
                     }
@@ -84,17 +106,105 @@ var dataset = new Vue({
         }
     },
     methods: {
+        addDateNumSuffix: function (NumString) {
+            let endstr = NumString.substr(-1, 1);
+            if (NumString == "11" || NumString == "12" || NumString == "13") return "th";
+
+            if (endstr == "1") return "st";
+            if (endstr == "2") return "nd";
+            if (endstr == "3") return "rd";
+
+            return "th";
+        },
+        compareDate: function (date1, date2) {
+            let yearDiff = date1.getFullYear() - date2.getFullYear();
+            let monthDiff = date1.getMonth() - date2.getMonth();
+            return yearDiff ? yearDiff : (monthDiff ? monthDiff : (date1.getDate() - date2.getDate()));
+        },
+        containDate: function (dateString) {
+            if (this.calendarDateSelect[0] == null) {
+                return true;
+            } else {
+                let date = this.string2date(dateString);
+                return (this.compareDate(date, this.calendarDateSelect[0]) >= 0 && this.compareDate(date, this.calendarDateSelect[1]) <= 0);
+            }
+        },
+        formatDate: function (date) {
+            if (date != null) {
+                return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+            } else {
+                return "";
+            }
+        },
+        getShowDate: function (dateString) {
+            let temp = dateString;
+            let date1 = this.string2date(temp);
+            let date2 = new Date();
+            let day1 = date1.getDate();
+            let day2 = date2.getDate();
+            return (date1.getFullYear() < date2.getFullYear()) ? temp :
+                (date1.getMonth() < date2.getMonth() ? temp.substr(5) :
+                    (day1 < day2 ? `${day1.toString()}${this.addDateNumSuffix(day1.toString())} ${(temp.split(" "))[1]}` :
+                        (temp.split(" "))[1]));
+        },
+        string2date: function (dateString) {
+            let temp = dateString;
+            return new Date((temp.split(" "))[0]);
+        },
+        fileNameArray2String: function (fileNameArray) {
+            let temp = [];
+            for (let tp of fileNameArray) {
+                temp.push(tp.oriName);
+            }
+            return temp.join("|");
+        },
+        getFileName: function (path) {
+            return path.substr(path.lastIndexOf("\\") + 1);
+        },
+        getFileName2: function (path) {
+            return path.substr(path.lastIndexOf("/") + 1);
+        },
+        getFileNames: function (oriString) {
+            let temp = oriString;
+            let Files = temp.split("|");
+            let FileNames = [];
+            for (let i = 0; i < Files.length; i++) {
+                var fileObj = {
+                    oriName: Files[i],
+                    path: (Files[i].split("*"))[0],
+                    name: this.getFileName((Files[i].split("*"))[0]),
+                    type: parseInt((Files[i].split("*"))[1])
+                };
+                FileNames.push(fileObj);
+            }
+            return FileNames;
+        },
+        getSearchCondition: function () {
+            var temp = "";
+            if (this.searchType != 46) {
+                temp += this.textShow[this.searchType];
+            }
+            if (this.calendarDateSelect[0] != null) {
+                if (this.searchType != 46) {
+                    temp += " & ";
+                }
+                temp += `${this.formatDate(this.calendarDateSelect[0])}-${this.formatDate(this.calendarDateSelect[1])}`;
+            }
+            return temp;
+        },
         onSearch: function (value) {
             if (value.length != 0) {
                 this.mode = 1;
             }
         },
         onInput: function (value) {
-            this.mode = (value.length == 0 ? 0 : 1);
+            if (this.searchType == 46) {
+                this.mode = (value.length == 0 ? 0 : 1);
+            }
         },
         onClear: function () {
+            this.content = [];
             window.getCommand1(this.commandName.ClearAll);
-            this.content.splice(0, this.content.length);
         },
         onSetting: function () {
             this.settingShow = true;
@@ -102,13 +212,50 @@ var dataset = new Vue({
         },
         onEditClick: function (event) {
             this.editId = parseInt(event.target.id);
-            this.editText = this.content[this.editId].text;
-            this.editShow = true;
-            window.getCommand2(this.commandName.Edit, this.editId);
+            if (this.content[this.editId].type == 21) {
+                this.editText = this.content[this.editId].text;
+                this.editShow = true;
+                window.getCommand2(this.commandName.Edit, this.editId);
+            } else if (this.content[this.editId].type == 41) {
+                this.editFile = this.getFileNames(this.content[this.editId].text);
+                this.editShow = true;
+                window.getCommand2(this.commandName.Edit, this.editId);
+            } else if (this.content[this.editId].type == 43) {
+                vant.Toast.fail(this.textShow[45]);
+            }
         },
         onEditOkClick: function (event) {
             this.content[this.editId].text = this.editText;
             window.getCommand3(this.commandName.EditText, this.editId, this.editText);
+            this.editShow = false;
+        },
+        onIgnoreFile: function (event) {
+            let index = parseInt(event.target.id);
+            this.editFile.splice(index, 1);
+        },
+        onAddFile: function (event) {
+            let addFileString = window.getCommand1(this.commandName.AddFile);
+            if (addFileString != "") {
+                let addFileNameArray = this.getFileNames(addFileString);
+                for (let i = 0; i < addFileNameArray.length; i++) {
+                    this.editFile.push(addFileNameArray[i]);
+                }
+                addFileNameArray = null;
+            }
+        },
+        onEditFileOkClick: function (event) {
+            if (this.editFile.length != 0) {
+                let fileNameString = this.fileNameArray2String(this.editFile);
+                this.content[this.editId].text = fileNameString;
+                window.getCommand3(this.commandName.EditText, this.editId, fileNameString);
+            } else {
+                let index = parseInt(this.content[this.editId].id);
+                window.getCommand2(this.commandName.Ignore, index);
+                this.content.splice(index, 1);
+                for (let i = index; i < this.content.length; i++) {
+                    this.content[i].id = i.toString();
+                }
+            }
             this.editShow = false;
         },
         onCopyClick: function (event) {
@@ -155,95 +302,69 @@ var dataset = new Vue({
                 settingPopup.scrollTop = settingPopup.scrollHeight;
             }, 10);
         },
+        onLanguageConfirm: function (value, index) {
+            window.getCommand3(this.commandName.SettingsNET, 9, index);
+            this.textShow = JSON.parse(window.getCommand1(this.commandName.LanguageText));
+            this.settings.Language = index;
+            this.languageShow = false;
+        },
+        onLanguageCancel: function () {
+            this.languageShow = false;
+        },
         onSliderChange: function (value) {
             window.getCommand3(this.commandName.SettingsNET, 8, value);
         },
         onSliderInput: function (value) {
             window.getCommand2(this.commandName.Opacity, value);
         },
-        onLanguageConfirm: function (value, index) {
-            window.getCommand3(this.commandName.SettingsNET, 9, index);
-            this.textShow = JSON.parse(window.getCommand1(this.commandName.LanguageText));
-            this.settings.Language = index;
-            this.languageShow = false;
-        },      
-        onLanguageCancel: function() {
-            this.languageShow = false;
-        },
-        formatDate: function(date) {
-            if (date != null) {
-                return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
-            }
-            else {
-                return "";
-            }
-        },
-        string2date: function(dateString) {
-            let temp = dateString;
-            return new Date((temp.split(" "))[0]);
-        },
-        compareDate: function(date1, date2) {
-            let year1 = date1.getFullYear();
-            let year2 = date2.getFullYear();
-            let month1 = date1.getMonth();
-            let month2 = date2.getMonth();
-            let day1 = date1.getDate();
-            let day2 = date2.getDate();
-            return (year1 - year2) ? (year1 - year2) : ((month1 - month2) ? (month1 - month2) : (day1 - day2));
-        },
-        containDate: function(dateString) {
-            if (this.calendarDateSelect[0] == null) {
-                return true;
-            }
-            else {             
-                let date = this.string2date(dateString);
-                return (this.compareDate(date, this.calendarDateSelect[0]) >= 0 && this.compareDate(date, this.calendarDateSelect[1]) <= 0);
-            }
-        },
-        addDateNumSuffix: function(NumString) {
-            let endstr = NumString.substr(-1, 1);
-            if (NumString == "11" || NumString == "12" || NumString == "13") return "th";
-
-            if (endstr == '1') return "st";
-            if (endstr == "2") return "nd";
-            if (endstr == "3") return "rd";
-
-            return "th";
-        },
-        getShowDate: function(dateString) {
-            let temp = dateString;
-            let date1 = this.string2date(temp);
-            let date2 = new Date();
-            let year1 = date1.getFullYear();
-            let year2 = date2.getFullYear();
-            let month1 = date1.getMonth();
-            let month2 = date2.getMonth();
-            let day1 = date1.getDate();
-            let day2 = date2.getDate();
-            return (year1 < year2) ? temp : (month1 < month2 ? temp.substr(5) : (day1 < day2 ? day1.toString() + this.addDateNumSuffix(day1.toString()) + " " + (temp.split(" "))[1] : (temp.split(" "))[1]));
-        },
-        onDateSelectShow: function() {
+        onDateSelectShow: function () {
             this.calendarShow = true;
             this.maxDate = new Date()
         },
-        onDateSelectConfirm: function(date) {
-            let [start, end] = date;          
+        onDateSelectConfirm: function (date) {
+            const [start, end] = date;
             this.calendarDateSelect[0] = start;
             this.calendarDateSelect[1] = end;
             this.calendarShow = false;
         },
-        onDateSelectCancel: function(event) {          
+        onDateSelectCancel: function (event) {
             this.calendarDateSelect[0] = null;
             this.calendarDateSelect[1] = null;
             this.calendarShow = false;
+        },
+        onSearchTypeShow: function () {
+            this.searchTypeShow = true;
+        },
+        onSearchTypeSelectAll: function (event) {
+            this.searchType = 46;
+            this.searchTypeShow = false;
+            if (this.value.length == 0) {
+                this.mode = 0;
+            }
+        },
+        onSearchTypeSelectText: function (event) {
+            this.searchType = 21;
+            this.searchTypeShow = false;
+            this.mode = 1;
+        },
+        onSearchTypeSelectFile: function (event) {
+            this.searchType = 41;
+            this.searchTypeShow = false;
+            this.mode = 1;
+        },
+        onSearchTypeSelectImage: function (event) {
+            this.searchType = 43;
+            this.searchTypeShow = false;
+            this.mode = 1;
         }
     }
 })
 var timeStart, timeEnd, time;
+
 function getTimeNow() {
-    var now = new Date();
-    return now.getTime();
+    return (new Date()).getTime();
 }
+
 function lockDown(event) {
     timeStart = getTimeNow();
     time = setInterval(function () {
@@ -260,14 +381,16 @@ function lockDown(event) {
                 window.getCommand2(dataset.commandName.Lock, index);
                 dataset.content[index].lock = !dataset.content[index].lock;
             }).catch((err) => {
-                alert(err.message);
+                //alert(err.message);
             });
         }
     }, 100);
 }
+
 function lockUp(event) {
     clearInterval(time);
 }
+
 function notify(type, msg) {
     dataset.settings.IsTop = (msg == dataset.textShow[20]);
     vant.Notify({
@@ -276,12 +399,17 @@ function notify(type, msg) {
         duration: 2000
     });
 }
+
 function add(tag) {
     dataset.content.push(JSON.parse(tag));
 }
-window.onload = function () {
+
+function adjustEditRow() {
     dataset.row = Math.floor(window.innerHeight * 0.4 / 26);
 }
+window.onload = function () {
+    this.adjustEditRow();
+}
 window.onresize = function () {
-    dataset.row = Math.floor(window.innerHeight * 0.4 / 26);
+    this.adjustEditRow();
 }

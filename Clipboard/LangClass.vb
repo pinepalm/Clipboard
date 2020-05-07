@@ -26,15 +26,13 @@
 
                 Case 3 To 5
 
-                    If NumStr.EndsWith("11") Then Return NumStr + "th"
-                    If NumStr.EndsWith("12") Then Return NumStr + "th"
-                    If NumStr.EndsWith("13") Then Return NumStr + "th"
+                    If NumStr.EndsWith("11") OrElse NumStr.EndsWith("12") OrElse NumStr.EndsWith("13") Then Return $"{NumStr}th"
 
-                    If NumStr.EndsWith("1") Then Return NumStr + "st"
-                    If NumStr.EndsWith("2") Then Return NumStr + "nd"
-                    If NumStr.EndsWith("3") Then Return NumStr + "rd"
+                    If NumStr.EndsWith("1") Then Return $"{NumStr}st"
+                    If NumStr.EndsWith("2") Then Return $"{NumStr}nd"
+                    If NumStr.EndsWith("3") Then Return $"{NumStr}rd"
 
-                    Return NumStr + "th"
+                    Return $"{NumStr}th"
 
                 Case Else
 
@@ -103,7 +101,13 @@
         "灾难性故障！",
         "完成",
         "取消日期选择",
-        "日期选择"
+        "日期选择",
+        "文件",
+        "文件夹",
+        "图像",
+        "新增",
+        "图像暂不支持编辑",
+        "全部"
         },
         New String() {
         "語音設置",
@@ -146,7 +150,13 @@
         "災難性故障！",
         "完成",
         "取消日期選擇",
-        "日期選擇"
+        "日期選擇",
+        "文件",
+        "文件夾",
+        "圖像",
+        "新增",
+        "圖像暫不支持編輯",
+        "全部"
         },
         New String() {
         "語音設置",
@@ -189,7 +199,13 @@
         "災難性故障！",
         "完成",
         "取消日期選擇",
-        "日期選擇"
+        "日期選擇",
+        "文件",
+        "文件夾",
+        "圖像",
+        "新增",
+        "圖像暫不支持編輯",
+        "全部"
         },
         New String() {
         "Speech Settings",
@@ -232,7 +248,13 @@
         "Catastrophic failure!",
         "OK",
         "Deselect Date",
-        "Select Date"
+        "Select Date",
+        "Document",
+        "Folder",
+        "Image",
+        "Add",
+        "Image editing isn't supported for the time being",
+        "All"
         },
         New String() {
         "Speech Settings",
@@ -275,7 +297,13 @@
         "Catastrophic failure!",
         "OK",
         "Deselect Date",
-        "Select Date"
+        "Select Date",
+        "Document",
+        "Folder",
+        "Image",
+        "Add",
+        "Image editing isn't supported for the time being",
+        "All"
         },
         New String() {
         "Speech Settings",
@@ -318,7 +346,13 @@
         "Catastrophic failure!",
         "OK",
         "Deselect Date",
-        "Select Date"
+        "Select Date",
+        "Document",
+        "Folder",
+        "Image",
+        "Add",
+        "Image editing isn't supported for the time being",
+        "All"
         }
     }
 

@@ -1,12 +1,13 @@
-﻿Imports Clipboard.ClipboardApi
+﻿Imports Clipboard.LangClass
+Imports Clipboard.ClipboardApi
 Imports Clipboard.JsonConverter
-Imports Clipboard.LangClass
 Imports Kyozy.MiniblinkNet
 Imports System.IO
 Imports System.Speech.Synthesis
+Imports System.Collections.Specialized
 
 Public Class MainForm
-
+    '显示UI
     Friend WithEvents ClipboardUI As WebView
 
     '已复制的数据列表
@@ -17,9 +18,6 @@ Public Class MainForm
 
     '解决复制时两次更新出现复制两次的情况
     Friend innerData As Integer = -1
-
-    '确定是否初始化
-    Friend init As Boolean = True
 
 #Region "Js & Net"
 
@@ -35,41 +33,80 @@ Public Class MainForm
         '除了参数命令外，还有两个参数的交互函数
         JsValue.BindFunction("getCommand3", New wkeJsNativeFunction(AddressOf getCommand3), 3)
 
-        ClipboardUI.LoadURL(Path.Combine(Application.StartupPath, "ClipboardUI\ClipboardUI.html"))
+        ClipboardUI.LoadURL(ClipboardUIPath)
     End Sub
 
 #Region "Net -> Js"
 
     Private Sub Notify(ByVal Msg As String, Optional ByVal Type As NotifyType = NotifyType.primary)
         'vant组件中的通知显示
-        ClipboardUI.RunJS(String.Format("notify(""{0}"",""{1}"")", Type.ToString(), Msg))
+        ClipboardUI.RunJS($"notify(""{Type}"",""{Msg}"")")
     End Sub
 
     Private Sub AddRecord()
-
         '判定内部复制
         If innerData <> -1 Then
             innerData -= 1
             Return
         End If
 
+        Dim PreText As String
         Dim iData As IDataObject = Windows.Forms.Clipboard.GetDataObject()
-        If iData IsNot Nothing AndAlso iData.GetDataPresent(DataFormats.Text) Then
-
-            '判定前一段复制的文本与此时复制的是否相同
-            Dim PreText As String = CType(iData.GetData(DataFormats.Text), String)
-            If DataList.Count = 0 OrElse Not PreText = DataList.Last.text Then
+        If iData IsNot Nothing Then
+            If iData.GetDataPresent(DataFormats.Text) Then
+                '判定前一段复制的文本与此时复制的是否相同
+                PreText = CType(iData.GetData(DataFormats.Text), String)
+                If DataList.Count = 0 OrElse Not PreText = DataList.Last.text Then
+                    Dim Temp As New DataTag With {
+                                        .type = 21,
+                                        .time = Time(TimeFormatter),
+                                        .text = PreText,
+                                        .id = DataList.Count.ToString,
+                                        .lock = False
+                                    }
+                    '添加记录
+                    ClipboardUI.RunJS($"add('{Object2Json(Temp, True)}')")
+                    DataList.Add(Temp)
+                    UpdateSeriFile()
+                End If
+            ElseIf iData.GetDataPresent(DataFormats.FileDrop) Then
+                Dim PreFileDrop As String() = iData.GetData(DataFormats.FileDrop)
+                For i = 0 To PreFileDrop.Length - 1
+                    PreFileDrop(i) &= GetFileType(PreFileDrop(i))
+                Next
+                PreText = String.Join("|", PreFileDrop)
+                If DataList.Count = 0 OrElse Not PreText = DataList.Last.text Then
+                    Dim Temp As New DataTag With {
+                                        .type = 41,
+                                        .time = Time(TimeFormatter),
+                                        .text = PreText,
+                                        .id = DataList.Count.ToString,
+                                        .lock = False
+                                    }
+                    '添加记录
+                    ClipboardUI.RunJS($"add('{Object2Json(Temp, True)}')")
+                    DataList.Add(Temp)
+                    UpdateSeriFile()
+                End If
+            ElseIf iData.GetDataPresent(DataFormats.Bitmap) Then
+                Dim PreImage As Image = CType(iData.GetData(DataFormats.Bitmap), Image)
+                CheckUiDirectory(ImageDataName, Sub()
+                                                    Directory.CreateDirectory(ImageDataPath)
+                                                End Sub)
+                PreText = $"../{ImageDataName}/{DataList.Count}.png"
                 Dim Temp As New DataTag With {
-                                    .type = 21,
-                                    .time = Now.ToString("yyyy/MM/dd HH:mm"),
-                                    .text = PreText,
-                                    .id = DataList.Count.ToString,
-                                    .lock = False
-                                }
+                                        .type = 43,
+                                        .time = Time(TimeFormatter),
+                                        .text = PreText,
+                                        .id = DataList.Count.ToString,
+                                        .lock = False
+                                    }
                 '添加记录
-                ClipboardUI.RunJS(String.Format("add('{0}')", Object2Json(Temp, True)))
+                PreImage.Save(Path.Combine(Application.StartupPath, $"{ImageDataName}\{DataList.Count}.png"), Imaging.ImageFormat.Png)
+                ClipboardUI.RunJS($"add('{Object2Json(Temp, True)}')")
                 DataList.Add(Temp)
                 UpdateSeriFile()
+                PreImage.Dispose()
             End If
         End If
     End Sub
@@ -85,6 +122,7 @@ Public Class MainForm
             Case CommandName.ClearAll
                 DataList.Clear()
                 UpdateSeriFile()
+                DeleteFolderContent(ImageDataPath)
                 ActionSpeech(SettingsName.SpeechClearall, SpecText(25))
 
                 Return JsValue.UndefinedValue
@@ -106,6 +144,17 @@ Public Class MainForm
             Case CommandName.LanguageType
                 Return JsValue.StringValue(jsExecState, Object2Json(LanguageType))
 
+            Case CommandName.AddFile
+                Dim SendText As String = String.Empty
+                If AddFileDialog.ShowDialog() = DialogResult.OK Then
+                    Dim Temp As String() = AddFileDialog.FileNames.Clone()
+                    For i = 0 To Temp.Length - 1
+                        Temp(i) &= GetFileType(Temp(i))
+                    Next
+                    SendText = String.Join("|", Temp)
+                End If
+                Return JsValue.StringValue(jsExecState, SendText)
+
             Case Else
                 Return JsValue.UndefinedValue
 
@@ -119,11 +168,39 @@ Public Class MainForm
             Case CommandName.Copy
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
                 innerData = 1
-                Windows.Forms.Clipboard.SetText(DataList(index).text)
+                Select Case DataList(index).type
+                    Case 21
+                        Windows.Forms.Clipboard.SetText(DataList(index).text)
+                    Case 41
+                        Dim TempFileDrop As New StringCollection()
+                        Dim TempPaths As String() = DataList(index).text.Split(New Char() {"|"c})
+                        For Each TempPath As String In TempPaths
+                            Dim Path As String() = TempPath.Split(New Char() {"*"c})
+                            If File.Exists(Path(0)) OrElse Directory.Exists(Path(0)) Then
+                                TempFileDrop.Add(Path(0))
+                            End If
+                        Next
+                        Windows.Forms.Clipboard.SetFileDropList(TempFileDrop)
+                    Case 43
+                        Try
+                            Dim TempImage As Image = Image.FromFile(DataList(index).text.Substring(3))
+                            Windows.Forms.Clipboard.SetImage(TempImage)
+                            TempImage.Dispose()
+                        Catch ex As Exception
+                            LogRecord(ex.Message)
+                        End Try
+                End Select
                 ActionSpeech(SettingsName.SpeechCopy, SpecText(19))
 
             Case CommandName.Ignore
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
+                If DataList(index).type = 43 Then
+                    Try
+                        File.Delete(Path.Combine(Application.StartupPath, DataList(index).text.Substring(3)))
+                    Catch ex As Exception
+                        LogRecord(ex.Message)
+                    End Try
+                End If
                 DataList.RemoveAt(index)
                 For i = index To DataList.Count - 1
                     DataList(i) = New DataTag With {
@@ -187,6 +264,7 @@ Public Class MainForm
                         SpeechMsg.Culture = New Globalization.CultureInfo(Settings.Language.ToString.Replace("_", "-"))
                         IsTopToolStripMenuItem.Text = SpecText(9) & "(&T)"
                         ExitToolStripMenuItem.Text = SpecText(23) & "(&E)"
+                        AddFileDialog.Title = SpecText(44)
                         WriteCore(OtherSec, [property], Settings.Language.ToString)
                     Case Else
 
@@ -219,14 +297,12 @@ Public Class MainForm
 
     Protected Overrides Sub WndProc(ByRef m As Message)
         Select Case m.Msg
-
             '构造窗体
             Case WindowMsg.WM_CREATE
                 SetDpiAwareness()
                 AddClipboardFormatListener(Handle)
 
                 LogRecord("START")
-
             '销毁窗体
             Case WindowMsg.WM_DESTROY
                 RemoveClipboardFormatListener(Handle)
@@ -237,7 +313,6 @@ Public Class MainForm
                 Speecher.Dispose()
 
                 LogRecord("END")
-
             '收到剪贴板更新
             Case ClipboardMsg.WM_CLIPBOARDUPDATE
                 AddRecord()
@@ -245,7 +320,6 @@ Public Class MainForm
             Case Else
 
         End Select
-
         MyBase.WndProc(m)
     End Sub
 
@@ -254,15 +328,24 @@ Public Class MainForm
 #Region "MainForm"
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
         ClipboardNotifyIcon.Icon = Icon.Clone()
-        SettingsHelper = New INIHelper(INIPath)
         '读取设置
+        CheckUiDirectory(ClipboardUIDirName, Sub()
+                                                 LogRecord("UI FILE IS MISSING")
+                                                 MessageBox.Show(SpecText(37), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                                                 Application.Exit()
+                                             End Sub)
+        CheckUiDirectory(ImageDataName, Sub()
+                                            Directory.CreateDirectory(ImageDataPath)
+                                        End Sub)
+        SettingsHelper = New INIHelper(INIPath)
         Settings = ReadSettings()
         Opacity = Settings.Opacity / 100
         IsTopToolStripMenuItem.Checked = Settings.IsTop
-        IsTopToolStripMenuItem.Text = SpecText(9) & "(&T)"
-        ExitToolStripMenuItem.Text = SpecText(23) & "(&E)"
+        TopMost = IsTopToolStripMenuItem.Checked
+        IsTopToolStripMenuItem.Text = $"{SpecText(9)}(&T)"
+        ExitToolStripMenuItem.Text = $"{SpecText(23)}(&E)"
+        AddFileDialog.Title = SpecText(44)
         '读取记录
         ReadSeriFile()
 
@@ -280,31 +363,30 @@ Public Class MainForm
         '初始化UI
         InitClipboardUI()
 
+        AddHandler KeyUp, AddressOf MainForm_KeyUp
+        AddHandler ClipboardNotifyIcon.MouseClick, AddressOf ClipboardNotifyIcon_MouseClick
+        AddHandler ExitToolStripMenuItem.Click, AddressOf ExitToolStripMenuItem_Click
+        AddHandler IsTopToolStripMenuItem.CheckedChanged, AddressOf IsTopToolStripMenuItem_CheckedChanged
         KeyPreview = True
-        init = False
     End Sub
 
-    Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles MyBase.KeyUp
-
-        '设置置顶
-        If e.Modifiers = Keys.Alt AndAlso e.KeyCode = Keys.T Then
-
-            IsTopToolStripMenuItem.Checked = Not IsTopToolStripMenuItem.Checked
-
-            '退出
-        ElseIf e.Modifiers = Keys.Alt AndAlso e.KeyCode = Keys.E Then
-
-            Close()
-
-        End If
-
+    Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs)
+        Select Case e.Modifiers
+            Case Keys.Alt
+                Select Case e.KeyCode
+                    Case Keys.T '设置置顶
+                        IsTopToolStripMenuItem.Checked = Not IsTopToolStripMenuItem.Checked
+                    Case Keys.E '退出
+                        Close()
+                End Select
+        End Select
     End Sub
 
 #End Region
 
 #Region "ClipboardNotifyIcon"
 
-    Private Sub ClipboardNotifyIcon_MouseClick(sender As Object, e As MouseEventArgs) Handles ClipboardNotifyIcon.MouseClick
+    Private Sub ClipboardNotifyIcon_MouseClick(sender As Object, e As MouseEventArgs)
         If e.Button = MouseButtons.Left Then
             Visible = Not Visible
             If Visible Then
@@ -317,24 +399,20 @@ Public Class MainForm
 
 #Region "IconContextMenuStrip"
 
-    Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
+    Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs)
         Close()
     End Sub
 
-    Private Sub IsTopToolStripMenuItem_CheckedChanged(sender As Object, e As EventArgs) Handles IsTopToolStripMenuItem.CheckedChanged
+    Private Sub IsTopToolStripMenuItem_CheckedChanged(sender As Object, e As EventArgs)
         TopMost = IsTopToolStripMenuItem.Checked
-        If init = True Then
-            init = False
-        Else
-            Dim Msg As String =
-                If(
-                IsTopToolStripMenuItem.Checked,
-                SpecText(20),
-                SpecText(22)
-                )
-            Notify(Msg)
-            ActionSpeech(SettingsName.SpeechTop, Msg)
-        End If
+        Dim Msg As String =
+                        If(
+                        IsTopToolStripMenuItem.Checked,
+                        SpecText(20),
+                        SpecText(22)
+                        )
+        Notify(Msg)
+        ActionSpeech(SettingsName.SpeechTop, Msg)
     End Sub
 
 #End Region
