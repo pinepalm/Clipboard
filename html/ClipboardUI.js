@@ -306,6 +306,7 @@ var dataset = new Vue({
                     this.content[i].id = i.toString();
                 }
             }
+            this.editId = 0; //必须加上这一条，未知bug原因
             this.editShow = false;
         },
         onCopyClick: function (event) {
@@ -423,10 +424,10 @@ function lockDown(event) {
         if (timeEnd - timeStart > 1000) {
             clearInterval(time);
             vant.Dialog.confirm({
-                cancelButtonText: dataset.textShow[this.languageTextEnum.Cancel],
-                confirmButtonText: dataset.textShow[this.languageTextEnum.Confirm],
-                title: dataset.textShow[this.languageTextEnum.Tips],
-                message: dataset.textShow[this.languageTextEnum.ConfirmLock + (dataset.content[parseInt(event.target.id)].lock ? 1 : 0)]
+                cancelButtonText: dataset.textShow[dataset.languageTextEnum.Cancel],
+                confirmButtonText: dataset.textShow[dataset.languageTextEnum.Confirm],
+                title: dataset.textShow[dataset.languageTextEnum.Tips],
+                message: dataset.textShow[dataset.languageTextEnum.ConfirmLock + (dataset.content[parseInt(event.target.id)].lock ? 1 : 0)]
             }).then(() => {
                 let index = parseInt(event.target.id);
                 window.getCommand2(dataset.commandName.Lock, index);
@@ -443,7 +444,7 @@ function lockUp(event) {
 }
 
 function notify(type, msg) {
-    dataset.settings.IsTop = (msg == dataset.textShow[this.languageTextEnum.Top]);
+    dataset.settings.IsTop = (msg == dataset.textShow[dataset.languageTextEnum.Top]);
     vant.Notify({
         type: type,
         message: msg,
