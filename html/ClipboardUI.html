@@ -20,59 +20,66 @@
         <van-popup id="settingPopup" v-model="settingShow" position="left" onselectstart="return false;"
             :style="{background:'white',width: '75%',height: '100%', cursor: 'default' }">
             <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }">
-                {{ textShow[0] }}
+                {{ textShow[languageTextEnum.SpeechSettings1] }}
             </van-divider>
             <div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[1] }}</div>
-                    <van-switch v-model="settings.Speech[0]" @change="onChangeSpeech"></van-switch>
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechEnabled] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechEnabled - 1]" @change="onChangeSpeech">
+                    </van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[2] }}</div>
-                    <van-switch v-model="settings.Speech[1]" :disabled="!settings.Speech[0]"
-                        @change="onChangeSpeechTop"></van-switch>
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechTop] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechTop - 1]"
+                        :disabled="!settings.Speech[languageTextEnum.SpeechEnabled - 1]" @change="onChangeSpeechTop">
+                    </van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[3] }}</div>
-                    <van-switch v-model="settings.Speech[2]" :disabled="!settings.Speech[0]"
-                        @change="onChangeSpeechEdit"></van-switch>
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechEdit] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechEdit - 1]"
+                        :disabled="!settings.Speech[languageTextEnum.SpeechEnabled - 1]" @change="onChangeSpeechEdit">
+                    </van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[4] }}</div>
-                    <van-switch v-model="settings.Speech[3]" :disabled="!settings.Speech[0]"
-                        @change="onChangeSpeechCopy"></van-switch>
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechCopy] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechCopy - 1]"
+                        :disabled="!settings.Speech[languageTextEnum.SpeechEnabled - 1]" @change="onChangeSpeechCopy">
+                    </van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[5] }}</div>
-                    <van-switch v-model="settings.Speech[4]" :disabled="!settings.Speech[0]"
-                        @change="onChangeSpeechIgnore"></van-switch>
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechIgnore] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechIgnore - 1]"
+                        :disabled="!settings.Speech[languageTextEnum.SpeechEnabled - 1]" @change="onChangeSpeechIgnore">
+                    </van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[6] }}</div>
-                    <van-switch v-model="settings.Speech[5]" :disabled="!settings.Speech[0]"
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechClearAll] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechClearAll - 1]"
+                        :disabled="!settings.Speech[languageTextEnum.SpeechEnabled - 1]"
                         @change="onChangeSpeechClearall"></van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[7] }}</div>
-                    <van-switch v-model="settings.Speech[6]" :disabled="!settings.Speech[0]"
+                    <div class="textStyle">{{ textShow[languageTextEnum.SpeechSettings2] }}</div>
+                    <van-switch v-model="settings.Speech[languageTextEnum.SpeechSettings2 - 1]"
+                        :disabled="!settings.Speech[languageTextEnum.SpeechEnabled - 1]"
                         @change="onChangeSpeechSetting"></van-switch>
                 </div>
             </div>
             <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }">
-                {{ textShow[8] }}
+                {{ textShow[languageTextEnum.OtherSettings] }}
             </van-divider>
             <div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[9] }}</div>
+                    <div class="textStyle">{{ textShow[languageTextEnum.IsTop] }}</div>
                     <van-switch v-model="settings.IsTop" @change="onChangeIsTop"></van-switch>
                 </div>
                 <div class="divStyle">
-                    <div class="textStyle">{{ textShow[10] }}</div>
+                    <div class="textStyle">{{ textShow[languageTextEnum.Language] }}</div>
                     <van-tag type="primary" size="large" @click="onLanguageClick">{{ languages[settings.Language] }}
                     </van-tag>
                 </div>
                 <div>
-                    <div class="textStyle" style="margin-left:15px;">{{ textShow[11] }}</div>
+                    <div class="textStyle" style="margin-left:15px;">{{ textShow[languageTextEnum.Opacity] }}</div>
                     <div style="margin: 10px 15px; cursor: pointer;">
                         <van-slider v-model="settings.Opacity" bar-height="4px" active-color="deepskyblue"
                             @change="onSliderChange" @input="onSliderInput">
@@ -84,8 +91,9 @@
                 </div>
             </div>
             <transition name="van-fade">
-                <van-picker v-show="languageShow" show-toolbar :cancel-button-text="textShow[29]"
-                    :confirm-button-text="textShow[30]" :title="textShow[12]" :default-index="settings.Language"
+                <van-picker v-show="languageShow" show-toolbar :cancel-button-text="textShow[languageTextEnum.Cancel]"
+                    :confirm-button-text="textShow[languageTextEnum.Confirm]"
+                    :title="textShow[languageTextEnum.LanguageSelection]" :default-index="settings.Language"
                     :columns="languages" @cancel="onLanguageCancel" @confirm="onLanguageConfirm"></van-picker>
             </transition>
         </van-popup>
@@ -93,20 +101,21 @@
         <!--Edit Panel-->
         <van-popup id="editPopup" v-model="editShow" round position="bottom" :style="{ height: '40%' }">
             <van-field v-model="editText" type="textarea" :rows="row"
-                v-if="content.length != 0 && content[editId].type == 21">
+                v-if="content.length != 0 && content[editId].type == languageTextEnum.Text">
                 <div slot="label">
                     <div style="display:flex;">
                         <van-icon class-prefix="mdl2" name="edit" size="22"></van-icon>
-                        <div style="margin-left:5px;font-size:18px;">{{ textShow[16] }}</div>
+                        <div style="margin-left:5px;font-size:18px;">{{ textShow[languageTextEnum.Edit] }}</div>
                     </div>
                     <div style="position: absolute;bottom: 0;">
-                        <van-button class="ripple" size="small" type="primary" @click="onEditOkClick">{{ textShow[38] }}
+                        <van-button class="ripple" size="small" type="primary" @click="onEditOkClick">
+                            {{ textShow[languageTextEnum.OK] }}
                         </van-button>
                     </div>
                 </div>
             </van-field>
             <div style="display: flex; min-height: 100%; flex-flow: row wrap;"
-                v-if="content.length != 0 && content[editId].type == 41">
+                v-if="content.length != 0 && content[editId].type == languageTextEnum.Document">
                 <div style="width: 100%; align-self: flex-start;">
                     <div style="display: flex; justify-content: space-between;"
                         v-for="(fileItem,fileIndex) in editFile">
@@ -115,54 +124,60 @@
                                 :title="fileItem.name" value=""></van-cell>
                         </div>
                         <van-icon :id="fileIndex" class="calendar" style="margin: auto 18px;" class-prefix="mdl2"
-                            name="delete" :title="textShow[18]" @click="onIgnoreFile"></van-icon>
+                            name="delete" :title="textShow[languageTextEnum.Ignore]" @click="onIgnoreFile"></van-icon>
                     </div>
-                    <div style="font-style: italic;" class="van-ellipsis" :title="textShow[44]">
-                        <van-cell icon-prefix="mdl2" icon="new-folder" :border="false" :title="textShow[44] + '…'"
-                            value="" @click="onAddFile"></van-cell>
+                    <div style="font-style: italic;" class="van-ellipsis" :title="textShow[languageTextEnum.Add]">
+                        <van-cell icon-prefix="mdl2" icon="new-folder" :border="false"
+                            :title="textShow[languageTextEnum.Add] + '…'" value="" @click="onAddFile"></van-cell>
                     </div>
                 </div>
                 <van-button style="width: 100%; align-self: flex-end;" square type="primary" @click="onEditFileOkClick">
-                    {{ textShow[38] }}</van-button>
+                    {{ textShow[languageTextEnum.OK] }}</van-button>
             </div>
         </van-popup>
         <van-popup id="searchTypePopup" v-model="searchTypeShow" round position="center"
             :style="{ width: '300px', cursor: 'default' }">
             <div class="searchTypeItem">
-                <van-cell icon-prefix="mdl2" :icon="iconShow[46]" :border="true" :title="textShow[46]" value=""
-                    :style="`background-color: ${searchType == 46 ? 'deepskyblue' : 'inherit'};`"
+                <van-cell icon-prefix="mdl2" :icon="iconShow[languageTextEnum.All]" :border="true"
+                    :title="textShow[languageTextEnum.All]" value=""
+                    :style="`background-color: ${searchType == languageTextEnum.All ? 'deepskyblue' : 'inherit'};`"
                     @click="onSearchTypeSelectAll">
                 </van-cell>
             </div>
             <div class="searchTypeItem">
-                <van-cell icon-prefix="mdl2" :icon="iconShow[21]" :border="true" :title="textShow[21]" value=""
-                    :style="`background-color: ${searchType == 21 ? 'deepskyblue' : 'inherit'};`"
+                <van-cell icon-prefix="mdl2" :icon="iconShow[languageTextEnum.Text]" :border="true"
+                    :title="textShow[languageTextEnum.Text]" value=""
+                    :style="`background-color: ${searchType == languageTextEnum.Text ? 'deepskyblue' : 'inherit'};`"
                     @click="onSearchTypeSelectText">
                 </van-cell>
             </div>
             <div class="searchTypeItem">
-                <van-cell icon-prefix="mdl2" :icon="iconShow[41]" :border="true" :title="textShow[41]" value=""
-                    :style="`background-color: ${searchType == 41 ? 'deepskyblue' : 'inherit'};`"
+                <van-cell icon-prefix="mdl2" :icon="iconShow[languageTextEnum.Document]" :border="true"
+                    :title="textShow[languageTextEnum.Document]" value=""
+                    :style="`background-color: ${searchType == languageTextEnum.Document ? 'deepskyblue' : 'inherit'};`"
                     @click="onSearchTypeSelectFile">
                 </van-cell>
             </div>
             <div class="searchTypeItem">
-                <van-cell icon-prefix="mdl2" :icon="iconShow[43]" :border="true" :title="textShow[43]" value=""
-                    :style="`background-color: ${searchType == 43 ? 'deepskyblue' : 'inherit'};`"
+                <van-cell icon-prefix="mdl2" :icon="iconShow[languageTextEnum.Image]" :border="true"
+                    :title="textShow[languageTextEnum.Image]" value=""
+                    :style="`background-color: ${searchType == languageTextEnum.Image ? 'deepskyblue' : 'inherit'};`"
                     @click="onSearchTypeSelectImage">
                 </van-cell>
             </div>
         </van-popup>
         <!---->
         <!--Select Date Range-->
-        <van-calendar v-model="calendarShow" color="deepskyblue" type="range" :confirm-text="textShow[30]"
-            :confirm-disabled-text="textShow[30]" :min-date="minDate" :max-date="maxDate" allow-same-day
-            @confirm="onDateSelectConfirm">
+        <van-calendar v-model="calendarShow" color="deepskyblue" type="range"
+            :confirm-text="textShow[languageTextEnum.Confirm]"
+            :confirm-disabled-text="textShow[languageTextEnum.Confirm]" :min-date="minDate" :max-date="maxDate"
+            allow-same-day @confirm="onDateSelectConfirm">
             <div slot="title">
                 <div style="display: flex; justify-content: center;">
                     <van-icon class="calendar" style="margin: auto -38px auto 18px;" class-prefix="mdl2"
-                        name="calendar-reply" :title="textShow[39]" @click="onDateSelectCancel"></van-icon>
-                    <div style="margin: 0px auto; text-align: center;">{{ textShow[40] }}</div>
+                        name="calendar-reply" :title="textShow[languageTextEnum.DeselectDate]"
+                        @click="onDateSelectCancel"></van-icon>
+                    <div style="margin: 0px auto; text-align: center;">{{ textShow[languageTextEnum.SelectDate] }}</div>
                 </div>
             </div>
         </van-calendar>
@@ -172,41 +187,42 @@
             <div style="display: flex;">
                 <div style="width: 100%;">
                     <form action="/">
-                        <van-search v-model="value" :placeholder="textShow[13]" shape="round" @search="onSearch"
-                            @input="onInput">
+                        <van-search v-model="value" :placeholder="textShow[languageTextEnum.NoneSearchKeywordsTip]"
+                            shape="round" @search="onSearch" @input="onInput">
                             <div slot="left-icon">
                                 <van-icon class="calendar" class-prefix="mdl2" name="find-legacy"
                                     :title="textShow[searchType]" @click="onSearchTypeShow"></van-icon>
                             </div>
                             <div slot="right-icon">
-                                <van-icon class="calendar" class-prefix="mdl2" name="calendar" :title="textShow[40]"
-                                    @click="onDateSelectShow"></van-icon>
+                                <van-icon class="calendar" class-prefix="mdl2" name="calendar"
+                                    :title="textShow[languageTextEnum.SelectDate]" @click="onDateSelectShow"></van-icon>
                             </div>
                         </van-search>
                     </form>
                 </div>
-                <div class="topCtrl" :title="textShow[14]">
+                <div class="topCtrl" :title="textShow[languageTextEnum.ClearAll]">
                     <van-icon class-prefix="mdl2" name="delete" size="30" @click="onClear" v-if="content.length != 0">
                     </van-icon>
                 </div>
-                <div class="topCtrl" :title="textShow[15]">
+                <div class="topCtrl" :title="textShow[languageTextEnum.Settings]">
                     <van-icon class-prefix="mdl2" name="settings" size="30" @click="onSetting"></van-icon>
                 </div>
             </div>
             <div style="text-align: center; color: deepskyblue;"
-                v-if="calendarDateSelect[0] != null || searchType != 46">
+                v-if="calendarDateSelect[0] != null || searchType != languageTextEnum.All">
                 {{ getSearchCondition() }}</div>
         </div>
         <!---->
         <!--Result Number-->
         <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px', cursor: 'default' }"
             v-show="mode == 1 ? true : false">
-            {{ rcNum }} {{ textShow[31] }}
+            {{ rcNum }} {{ textShow[languageTextEnum.Results] }}
         </van-divider>
         <!---->
         <!--Render Records-->
         <transition-group appear tag="">
-            <div v-for="(item,index) in getContent" v-if="item.lock && containDate(item.time)" :key="`recordPanel${item.id}`">
+            <div v-for="(item,index) in getContent" v-if="item.lock && containDate(item.time)"
+                :key="`recordPanel${item.key}`">
                 <van-panel style="position: relative;">
                     <div slot="header">
                         <div style="display: flex; justify-content: space-between;">
@@ -219,40 +235,44 @@
                         </div>
                         <van-divider style="margin: 0px;"></van-divider>
                     </div>
-                    <div style="padding-left: 18px; " class="van-multi-ellipsis--l3" v-if="item.type == 21">
+                    <div style="padding-left: 18px; " class="van-multi-ellipsis--l3"
+                        v-if="item.type == languageTextEnum.Text">
                         {{ item.text }}
                     </div>
-                    <div style="padding-left: 18px; " v-if="item.type == 41">
+                    <div style="padding-left: 18px; " v-if="item.type == languageTextEnum.Document">
                         <div class="van-ellipsis" v-for="(fileItem,fileIndex) in getFileNames(item.text)">
                             <van-icon class-prefix="mdl2" :name="iconShow[fileItem.type]" :title="fileItem.path"
                                 style="margin: 5px 5px 5px 0px;">{{ fileItem.name }}</van-icon>
                         </div>
                     </div>
-                    <div style="padding-left: 18px; margin-right: 18px;" v-if="item.type == 43">
+                    <div style="padding-left: 18px; margin-right: 18px;" v-if="item.type == languageTextEnum.Image">
                         <van-image :src="item.text" alt="???" fit="scale-down" :title="getFileName2(item.text)">
                         </van-image>
                     </div>
                     <div slot="footer" style="display: flex; justify-content: space-between;">
                         <div style="display: flex;">
-                            <van-button :id="item.id" class="ripple" round size="small" color="#7232dd"
+                            <van-button :id="item.id" class="ripple" size="small" color="#7232dd"
                                 icon-prefix="mdl2" icon="edit" @click="onEditClick" onmousedown="lockDown(event)"
                                 onmouseup="lockUp(event)">
-                                {{ textShow[16] }}/{{ textShow[36] }}</van-button>
+                                {{ textShow[languageTextEnum.Edit] }}/{{ textShow[languageTextEnum.Unlock] }}
+                            </van-button>
                             <div style="margin:auto 4px;color:orangered;">
                                 <van-icon class-prefix="mdl2" name="favorite-star-fill" size="22"></van-icon>
                             </div>
                         </div>
                         <div style="display: flex;">
-                            <van-button :id="item.id" class="ripple" round size="small" type="primary"
+                            <van-button :id="item.id" class="ripple" size="small" type="primary"
                                 style="margin-right:3px;" icon-prefix="mdl2" icon="copy" @click="onCopyClick">
-                                {{ textShow[17] }}</van-button>
-                            <van-button :id="item.id" class="ripple" round size="small" type="info" icon-prefix="mdl2"
-                                icon="delete" @click="onIgnoreClick">{{ textShow[18] }}</van-button>
+                                {{ textShow[languageTextEnum.Copy] }}</van-button>
+                            <van-button :id="item.id" class="ripple" size="small" type="info" icon-prefix="mdl2"
+                                icon="delete" @click="onIgnoreClick">{{ textShow[languageTextEnum.Ignore] }}
+                            </van-button>
                         </div>
                     </div>
                 </van-panel>
             </div>
-            <div v-for="(item,index) in getContent" v-if="!item.lock && containDate(item.time)" :key="`recordPanel${item.id}`">
+            <div v-for="(item,index) in getContent" v-if="!item.lock && containDate(item.time)"
+                :key="`recordPanel${item.key}`">
                 <van-panel style="position: relative;">
                     <div slot="header">
                         <div style="display: flex; justify-content: space-between;">
@@ -265,31 +285,32 @@
                         </div>
                         <van-divider style="margin: 0px;"></van-divider>
                     </div>
-                    <div style="padding-left: 18px; " class="van-multi-ellipsis--l3" v-if="item.type == 21">
+                    <div style="padding-left: 18px; " class="van-multi-ellipsis--l3"
+                        v-if="item.type == languageTextEnum.Text">
                         {{ item.text }}
                     </div>
-                    <div style="padding-left: 18px; " v-if="item.type == 41">
+                    <div style="padding-left: 18px; " v-if="item.type == languageTextEnum.Document">
                         <div class="van-ellipsis" v-for="(fileItem,fileIndex) in getFileNames(item.text)">
                             <van-icon class-prefix="mdl2" :name="iconShow[fileItem.type]" :title="fileItem.path"
                                 style="margin: 5px 5px 5px 0px;">{{ fileItem.name }}</van-icon>
                         </div>
                     </div>
-                    <div style="padding-left: 18px; margin-right: 18px;" v-if="item.type == 43">
+                    <div style="padding-left: 18px; margin-right: 18px;" v-if="item.type == languageTextEnum.Image">
                         <van-image :src="item.text" alt="???" fit="scale-down" :title="getFileName2(item.text)">
                         </van-image>
                     </div>
                     <div slot="footer" style="display: flex; justify-content: space-between;">
-                        <van-button :id="item.id" class="ripple" round size="small" color="#7232dd" icon-prefix="mdl2"
+                        <van-button :id="item.id" class="ripple" size="small" color="#7232dd" icon-prefix="mdl2"
                             icon="edit" @click="onEditClick" onmousedown="lockDown(event)" onmouseup="lockUp(event)">
-                            {{ textShow[16] }}/{{ textShow[35] }}
+                            {{ textShow[languageTextEnum.Edit] }}/{{ textShow[languageTextEnum.Lock] }}
                         </van-button>
                         <div style="display: flex;">
-                            <van-button :id="item.id" class="ripple" round size="small" type="primary"
+                            <van-button :id="item.id" class="ripple" size="small" type="primary"
                                 style="margin-right:3px;" icon-prefix="mdl2" icon="copy" @click="onCopyClick">
-                                {{ textShow[17] }}
+                                {{ textShow[languageTextEnum.Copy] }}
                             </van-button>
-                            <van-button :id="item.id" class="ripple" round size="small" type="info" icon-prefix="mdl2"
-                                icon="delete" @click="onIgnoreClick">{{ textShow[18] }}
+                            <van-button :id="item.id" class="ripple" size="small" type="info" icon-prefix="mdl2"
+                                icon="delete" @click="onIgnoreClick">{{ textShow[languageTextEnum.Ignore] }}
                             </van-button>
                         </div>
                     </div>

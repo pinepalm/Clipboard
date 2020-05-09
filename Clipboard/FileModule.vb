@@ -62,8 +62,12 @@ Module FileModule
     Friend Sub DeleteFolderContent(ByVal Path As String)
         If Directory.Exists(Path) Then
             Dim Temp As New DirectoryInfo(Path)
-            ForEachInEnumerable(Temp.EnumerateFiles(), Sub(F) F.Delete())
-            ForEachInEnumerable(Temp.EnumerateDirectories(), Sub(D) D.Delete(True))
+            ForEachInEnumerable(Temp.EnumerateFiles(),
+                                Sub(F) F.Delete()
+                                    )
+            ForEachInEnumerable(Temp.EnumerateDirectories(),
+                                Sub(D) D.Delete(True)
+                                    )
         End If
     End Sub
 
@@ -193,7 +197,7 @@ Module FileModule
             End Using
         Catch ex As Exception
             LogRecord(ex.Message)
-            MessageBox.Show(SpecText(37), MainForm.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show(SpecText(LanguageTextEnum.CatastrophicFailure), MainForm.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Application.Exit()
         End Try
     End Sub

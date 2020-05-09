@@ -50,6 +50,55 @@ var dataset = new Vue({
             SettingsNET: 12,
             EditText: 13
         },
+        languageTextEnum: {
+            SpeechSettings1: 0,
+            SpeechEnabled: 1,
+            SpeechTop: 2,
+            SpeechEdit: 3,
+            SpeechCopy: 4,
+            SpeechIgnore: 5,
+            SpeechClearAll: 6,
+            SpeechSettings2: 7,
+            OtherSettings: 8,
+            IsTop: 9,
+            Language: 10,
+            Opacity: 11,
+            LanguageSelection: 12,
+            NoneSearchKeywordsTip: 13,
+            ClearAll: 14,
+            Settings: 15,
+            Edit: 16,
+            Copy: 17,
+            Ignore: 18,
+            CopySuccessfully: 19,
+            Top: 20,
+            Text: 21,
+            NonTop: 22,
+            Exit: 23,
+            HaveIgnored: 24,
+            HaveClearedAll: 25,
+            HaveOpenedSettings: 26,
+            EditingRecent: 27,
+            Record: 28,
+            Cancel: 29,
+            Confirm: 30,
+            Results: 31,
+            Tips: 32,
+            ConfirmLock: 33,
+            ConfirmUnlock: 34,
+            Lock: 35,
+            Unlock: 36,
+            CatastrophicFailure: 37,
+            OK: 38,
+            DeselectDate: 39,
+            SelectDate: 40,
+            Document: 41,
+            Folder: 42,
+            Image: 43,
+            Add: 44,
+            ImageEditingUnsupported: 45,
+            All: 46
+        },
         textShow: [
 
         ],
@@ -79,7 +128,7 @@ var dataset = new Vue({
                 case 1: //search
                     let temp = [];
                     let trueNum = 0;
-                    if (this.searchType == 46) {
+                    if (this.searchType == this.languageTextEnum.All) {
                         for (let tp of this.content) {
                             if (tp.text.indexOf(this.value) != -1) {
                                 temp.push(tp);
@@ -181,11 +230,11 @@ var dataset = new Vue({
         },
         getSearchCondition: function () {
             var temp = "";
-            if (this.searchType != 46) {
+            if (this.searchType != this.languageTextEnum.All) {
                 temp += this.textShow[this.searchType];
             }
             if (this.calendarDateSelect[0] != null) {
-                if (this.searchType != 46) {
+                if (this.searchType != this.languageTextEnum.All) {
                     temp += " & ";
                 }
                 temp += `${this.formatDate(this.calendarDateSelect[0])}-${this.formatDate(this.calendarDateSelect[1])}`;
@@ -198,7 +247,7 @@ var dataset = new Vue({
             }
         },
         onInput: function (value) {
-            if (this.searchType == 46) {
+            if (this.searchType == this.languageTextEnum.All) {
                 this.mode = (value.length == 0 ? 0 : 1);
             }
         },
@@ -211,22 +260,23 @@ var dataset = new Vue({
             window.getCommand1(this.commandName.OpenSetting);
         },
         onEditClick: function (event) {
-            this.editId = parseInt(event.target.id);
-            if (this.content[this.editId].type == 21) {
+            this.editId = parseInt(event.target.id); //这里有奇怪的bug
+            if (this.content[this.editId].type == this.languageTextEnum.Text) {
                 this.editText = this.content[this.editId].text;
                 this.editShow = true;
                 window.getCommand2(this.commandName.Edit, this.editId);
-            } else if (this.content[this.editId].type == 41) {
+            } else if (this.content[this.editId].type == this.languageTextEnum.Document) {
                 this.editFile = this.getFileNames(this.content[this.editId].text);
                 this.editShow = true;
                 window.getCommand2(this.commandName.Edit, this.editId);
-            } else if (this.content[this.editId].type == 43) {
-                vant.Toast.fail(this.textShow[45]);
+            } else if (this.content[this.editId].type == this.languageTextEnum.Image) {
+                vant.Toast.fail(this.textShow[this.languageTextEnum.ImageEditingUnsupported]);
             }
         },
         onEditOkClick: function (event) {
             this.content[this.editId].text = this.editText;
             window.getCommand3(this.commandName.EditText, this.editId, this.editText);
+            this.editId = 0; //必须加上这一条，未知bug原因
             this.editShow = false;
         },
         onIgnoreFile: function (event) {
@@ -261,10 +311,11 @@ var dataset = new Vue({
         onCopyClick: function (event) {
             let index = parseInt(event.target.id);
             window.getCommand2(this.commandName.Copy, index);
-            vant.Toast.success(this.textShow[19]);
+            vant.Toast.success(this.textShow[this.languageTextEnum.CopySuccessfully]);
         },
         onIgnoreClick: function (event) {
             let index = parseInt(event.target.id);
+            this.editId = 0; //必须加上这一条，未知bug原因
             window.getCommand2(this.commandName.Ignore, index);
             this.content.splice(index, 1);
             for (let i = index; i < this.content.length; i++) {
@@ -336,24 +387,24 @@ var dataset = new Vue({
             this.searchTypeShow = true;
         },
         onSearchTypeSelectAll: function (event) {
-            this.searchType = 46;
+            this.searchType = this.languageTextEnum.All;
             this.searchTypeShow = false;
             if (this.value.length == 0) {
                 this.mode = 0;
             }
         },
         onSearchTypeSelectText: function (event) {
-            this.searchType = 21;
+            this.searchType = this.languageTextEnum.Text;
             this.searchTypeShow = false;
             this.mode = 1;
         },
         onSearchTypeSelectFile: function (event) {
-            this.searchType = 41;
+            this.searchType = this.languageTextEnum.Document;
             this.searchTypeShow = false;
             this.mode = 1;
         },
         onSearchTypeSelectImage: function (event) {
-            this.searchType = 43;
+            this.searchType = this.languageTextEnum.Image;
             this.searchTypeShow = false;
             this.mode = 1;
         }
@@ -372,10 +423,10 @@ function lockDown(event) {
         if (timeEnd - timeStart > 1000) {
             clearInterval(time);
             vant.Dialog.confirm({
-                cancelButtonText: dataset.textShow[29],
-                confirmButtonText: dataset.textShow[30],
-                title: dataset.textShow[32],
-                message: dataset.textShow[33 + (dataset.content[parseInt(event.target.id)].lock ? 1 : 0)]
+                cancelButtonText: dataset.textShow[this.languageTextEnum.Cancel],
+                confirmButtonText: dataset.textShow[this.languageTextEnum.Confirm],
+                title: dataset.textShow[this.languageTextEnum.Tips],
+                message: dataset.textShow[this.languageTextEnum.ConfirmLock + (dataset.content[parseInt(event.target.id)].lock ? 1 : 0)]
             }).then(() => {
                 let index = parseInt(event.target.id);
                 window.getCommand2(dataset.commandName.Lock, index);
@@ -392,7 +443,7 @@ function lockUp(event) {
 }
 
 function notify(type, msg) {
-    dataset.settings.IsTop = (msg == dataset.textShow[20]);
+    dataset.settings.IsTop = (msg == dataset.textShow[this.languageTextEnum.Top]);
     vant.Notify({
         type: type,
         message: msg,

@@ -31,6 +31,7 @@ Partial Class MainForm
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.WebViewPanel = New System.Windows.Forms.Panel()
         Me.AddFileDialog = New System.Windows.Forms.OpenFileDialog()
+        Me.MonitorableToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.IconContextMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -43,27 +44,27 @@ Partial Class MainForm
         'IconContextMenuStrip
         '
         Me.IconContextMenuStrip.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.IconContextMenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IsTopToolStripMenuItem, Me.ToolStripSeparator1, Me.ExitToolStripMenuItem})
+        Me.IconContextMenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MonitorableToolStripMenuItem, Me.IsTopToolStripMenuItem, Me.ToolStripSeparator1, Me.ExitToolStripMenuItem})
         Me.IconContextMenuStrip.Name = "IconContextMenuStrip"
-        Me.IconContextMenuStrip.Size = New System.Drawing.Size(132, 62)
+        Me.IconContextMenuStrip.Size = New System.Drawing.Size(215, 116)
         '
         'IsTopToolStripMenuItem
         '
         Me.IsTopToolStripMenuItem.CheckOnClick = True
         Me.IsTopToolStripMenuItem.Name = "IsTopToolStripMenuItem"
-        Me.IsTopToolStripMenuItem.Size = New System.Drawing.Size(131, 26)
+        Me.IsTopToolStripMenuItem.Size = New System.Drawing.Size(214, 26)
         Me.IsTopToolStripMenuItem.Text = "置顶(&T)"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(128, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(211, 6)
         '
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Image = CType(resources.GetObject("ExitToolStripMenuItem.Image"), System.Drawing.Image)
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(131, 26)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(214, 26)
         Me.ExitToolStripMenuItem.Text = "退出(&E)"
         '
         'WebViewPanel
@@ -78,6 +79,15 @@ Partial Class MainForm
         '
         Me.AddFileDialog.Filter = "All files (*.*)|*.*"
         Me.AddFileDialog.Multiselect = True
+        '
+        'MonitorableToolStripMenuItem
+        '
+        Me.MonitorableToolStripMenuItem.Checked = True
+        Me.MonitorableToolStripMenuItem.CheckOnClick = True
+        Me.MonitorableToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.MonitorableToolStripMenuItem.Name = "MonitorableToolStripMenuItem"
+        Me.MonitorableToolStripMenuItem.Size = New System.Drawing.Size(214, 26)
+        Me.MonitorableToolStripMenuItem.Text = "监听(&L)"
         '
         'MainForm
         '
@@ -101,4 +111,5 @@ Partial Class MainForm
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents WebViewPanel As Panel
     Friend WithEvents AddFileDialog As OpenFileDialog
+    Friend WithEvents MonitorableToolStripMenuItem As ToolStripMenuItem
 End Class

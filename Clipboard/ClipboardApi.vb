@@ -1,5 +1,6 @@
 ﻿Imports Clipboard.LangClass
 Imports System.Text
+Imports System.Security.Cryptography
 Imports System.Runtime.InteropServices
 
 Public Class ClipboardApi
@@ -10,17 +11,18 @@ Public Class ClipboardApi
     Public Const SHELL32 As String = "Shell32.dll"
 
     ''' <summary>
-    ''' 数据结构
+    ''' 数据对象
     ''' </summary>
     ''' <remarks></remarks>
     <Serializable>
-    Public Structure DataTag
+    Public Class DataTag
         Public type As Integer
         Public time As String
         Public text As String
         Public id As String
+        Public key As String
         Public lock As Boolean
-    End Structure
+    End Class
 
     ''' <summary>
     ''' 设置结构
@@ -411,6 +413,21 @@ Public Class ClipboardApi
             SetProcessDPIAware()
         End If
     End Sub
+
+    Public Shared Function MD5Encode(ByVal [String] As String) As String
+        Using md5Hash As MD5 = MD5.Create()
+            Return GetMd5Hash(md5Hash, [String])
+        End Using
+    End Function
+
+    Private Shared Function GetMd5Hash(ByVal Md5Hash As MD5, ByVal Input As String) As String
+        Dim data As Byte() = Md5Hash.ComputeHash(Encoding.UTF8.GetBytes(Input))
+        Dim sBuilder As New StringBuilder()
+        For i = 0 To data.Length - 1
+            sBuilder.Append(data(i).ToString("x2"))
+        Next i
+        Return sBuilder.ToString()
+    End Function
 
 #End Region
 

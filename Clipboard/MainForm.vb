@@ -7,32 +7,24 @@ Imports System.Speech.Synthesis
 Imports System.Collections.Specialized
 
 Public Class MainForm
-    '显示UI
-    Friend WithEvents ClipboardUI As WebView
-
-    '已复制的数据列表
-    Friend DataList As List(Of DataTag)
-
-    '设置结构
-    Friend Settings As Settings
-
-    '解决复制时两次更新出现复制两次的情况
-    Friend innerData As Integer = -1
+    Friend WithEvents ClipboardUI As WebView    '显示UI
+    Friend DataList As List(Of DataTag)         '已复制的数据列表
+    Friend Settings As Settings                 '设置结构
+    Friend innerData As Integer = -1            '解决复制时两次更新出现复制两次的情况
 
 #Region "Js & Net"
 
     Private Sub InitClipboardUI()
         ClipboardUI = New WebView(WebViewPanel)
-
         '只有参数命令的交互函数
-        JsValue.BindFunction("getCommand1", New wkeJsNativeFunction(AddressOf getCommand1), 1)
-
+        JsValue.BindFunction("getCommand1",
+                             New wkeJsNativeFunction(AddressOf getCommand1), 1)
         '除了参数命令外，还有一个参数的交互函数
-        JsValue.BindFunction("getCommand2", New wkeJsNativeFunction(AddressOf getCommand2), 2)
-
+        JsValue.BindFunction("getCommand2",
+                             New wkeJsNativeFunction(AddressOf getCommand2), 2)
         '除了参数命令外，还有两个参数的交互函数
-        JsValue.BindFunction("getCommand3", New wkeJsNativeFunction(AddressOf getCommand3), 3)
-
+        JsValue.BindFunction("getCommand3",
+                             New wkeJsNativeFunction(AddressOf getCommand3), 3)
         ClipboardUI.LoadURL(ClipboardUIPath)
     End Sub
 
@@ -62,6 +54,7 @@ Public Class MainForm
                                         .time = Time(TimeFormatter),
                                         .text = PreText,
                                         .id = DataList.Count.ToString,
+                                        .key = MD5Encode($"{ .type} { .time} { .text}"),
                                         .lock = False
                                     }
                     '添加记录
@@ -81,6 +74,7 @@ Public Class MainForm
                                         .time = Time(TimeFormatter),
                                         .text = PreText,
                                         .id = DataList.Count.ToString,
+                                        .key = MD5Encode($"{ .type} { .time} { .text}"),
                                         .lock = False
                                     }
                     '添加记录
@@ -99,6 +93,7 @@ Public Class MainForm
                                         .time = Time(TimeFormatter),
                                         .text = PreText,
                                         .id = DataList.Count.ToString,
+                                        .key = MD5Encode($"{ .type} { .time} { .text}"),
                                         .lock = False
                                     }
                 '添加记录
@@ -123,12 +118,12 @@ Public Class MainForm
                 DataList.Clear()
                 UpdateSeriFile()
                 DeleteFolderContent(ImageDataPath)
-                ActionSpeech(SettingsName.SpeechClearall, SpecText(25))
+                ActionSpeech(SettingsName.SpeechClearall, SpecText(LanguageTextEnum.HaveClearedAll))
 
                 Return JsValue.UndefinedValue
 
             Case CommandName.OpenSetting
-                ActionSpeech(SettingsName.SpeechSetting, SpecText(26))
+                ActionSpeech(SettingsName.SpeechSetting, SpecText(LanguageTextEnum.HaveOpenedSettings))
 
                 Return JsValue.UndefinedValue
 
@@ -169,9 +164,9 @@ Public Class MainForm
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
                 innerData = 1
                 Select Case DataList(index).type
-                    Case 21
+                    Case LanguageTextEnum.Text
                         Windows.Forms.Clipboard.SetText(DataList(index).text)
-                    Case 41
+                    Case LanguageTextEnum.Document
                         Dim TempFileDrop As New StringCollection()
                         Dim TempPaths As String() = DataList(index).text.Split(New Char() {"|"c})
                         For Each TempPath As String In TempPaths
@@ -181,7 +176,7 @@ Public Class MainForm
                             End If
                         Next
                         Windows.Forms.Clipboard.SetFileDropList(TempFileDrop)
-                    Case 43
+                    Case LanguageTextEnum.Image
                         Try
                             Dim TempImage As Image = Image.FromFile(DataList(index).text.Substring(3))
                             Windows.Forms.Clipboard.SetImage(TempImage)
@@ -190,11 +185,11 @@ Public Class MainForm
                             LogRecord(ex.Message)
                         End Try
                 End Select
-                ActionSpeech(SettingsName.SpeechCopy, SpecText(19))
+                ActionSpeech(SettingsName.SpeechCopy, SpecText(LanguageTextEnum.CopySuccessfully))
 
             Case CommandName.Ignore
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                If DataList(index).type = 43 Then
+                If DataList(index).type = LanguageTextEnum.Image Then
                     Try
                         File.Delete(Path.Combine(Application.StartupPath, DataList(index).text.Substring(3)))
                     Catch ex As Exception
@@ -203,20 +198,14 @@ Public Class MainForm
                 End If
                 DataList.RemoveAt(index)
                 For i = index To DataList.Count - 1
-                    DataList(i) = New DataTag With {
-                                            .type = DataList(i).type,
-                                            .time = DataList(i).time,
-                                            .text = DataList(i).text,
-                                            .id = i.ToString,
-                                            .lock = DataList(i).lock
-                                        }
+                    DataList(i).id = i.ToString()
                 Next
                 UpdateSeriFile()
-                ActionSpeech(SettingsName.SpeechIgnore, SpecText(24))
+                ActionSpeech(SettingsName.SpeechIgnore, SpecText(LanguageTextEnum.HaveIgnored))
 
             Case CommandName.Edit
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                ActionSpeech(SettingsName.SpeechEdit, SpecText(27) & " " & NumSuffix(DataList.Count - index) & " " & SpecText(28))
+                ActionSpeech(SettingsName.SpeechEdit, $"{SpecText(LanguageTextEnum.EditingRecent)} {NumSuffix(DataList.Count - index)} {SpecText(LanguageTextEnum.Record)}")
 
             Case CommandName.Opacity
                 Dim opacity As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
@@ -224,13 +213,7 @@ Public Class MainForm
 
             Case CommandName.Lock
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                DataList(index) = New DataTag With {
-                                            .type = DataList(index).type,
-                                            .time = DataList(index).time,
-                                            .text = DataList(index).text,
-                                            .id = index.ToString,
-                                            .lock = Not DataList(index).lock
-                                        }
+                DataList(index).lock = Not DataList(index).lock
                 UpdateSeriFile()
 
             Case Else
@@ -262,9 +245,10 @@ Public Class MainForm
                     Case 9
                         Settings.Language = value
                         SpeechMsg.Culture = New Globalization.CultureInfo(Settings.Language.ToString.Replace("_", "-"))
-                        IsTopToolStripMenuItem.Text = SpecText(9) & "(&T)"
-                        ExitToolStripMenuItem.Text = SpecText(23) & "(&E)"
-                        AddFileDialog.Title = SpecText(44)
+                        MonitorableToolStripMenuItem.Text = $"{SpecText(LanguageTextEnum.Monitorable)}(&L)"
+                        IsTopToolStripMenuItem.Text = SpecText(LanguageTextEnum.IsTop) & "(&T)"
+                        ExitToolStripMenuItem.Text = SpecText(LanguageTextEnum.Exit) & "(&E)"
+                        AddFileDialog.Title = SpecText(LanguageTextEnum.Add)
                         WriteCore(OtherSec, [property], Settings.Language.ToString)
                     Case Else
 
@@ -273,13 +257,7 @@ Public Class MainForm
             Case CommandName.EditText
                 Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
                 Dim text As String = JsValue.Arg(jsExecState, 2).ToString(jsExecState)
-                DataList(index) = New DataTag With {
-                                            .type = DataList(index).type,
-                                            .time = DataList(index).time,
-                                            .text = text,
-                                            .id = DataList(index).id,
-                                            .lock = DataList(index).lock
-                                        }
+                DataList(index).text = text
                 UpdateSeriFile()
 
             Case Else
@@ -315,7 +293,9 @@ Public Class MainForm
                 LogRecord("END")
             '收到剪贴板更新
             Case ClipboardMsg.WM_CLIPBOARDUPDATE
-                AddRecord()
+                If MonitorableToolStripMenuItem.Checked Then
+                    AddRecord()
+                End If
 
             Case Else
 
@@ -332,7 +312,7 @@ Public Class MainForm
         '读取设置
         CheckUiDirectory(ClipboardUIDirName, Sub()
                                                  LogRecord("UI FILE IS MISSING")
-                                                 MessageBox.Show(SpecText(37), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                                                 MessageBox.Show(SpecText(LanguageTextEnum.CatastrophicFailure), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
                                                  Application.Exit()
                                              End Sub)
         CheckUiDirectory(ImageDataName, Sub()
@@ -343,9 +323,10 @@ Public Class MainForm
         Opacity = Settings.Opacity / 100
         IsTopToolStripMenuItem.Checked = Settings.IsTop
         TopMost = IsTopToolStripMenuItem.Checked
-        IsTopToolStripMenuItem.Text = $"{SpecText(9)}(&T)"
-        ExitToolStripMenuItem.Text = $"{SpecText(23)}(&E)"
-        AddFileDialog.Title = SpecText(44)
+        MonitorableToolStripMenuItem.Text = $"{SpecText(LanguageTextEnum.Monitorable)}(&L)"
+        IsTopToolStripMenuItem.Text = $"{SpecText(LanguageTextEnum.IsTop)}(&T)"
+        ExitToolStripMenuItem.Text = $"{SpecText(LanguageTextEnum.Exit)}(&E)"
+        AddFileDialog.Title = SpecText(LanguageTextEnum.Add)
         '读取记录
         ReadSeriFile()
 
@@ -363,10 +344,18 @@ Public Class MainForm
         '初始化UI
         InitClipboardUI()
 
-        AddHandler KeyUp, AddressOf MainForm_KeyUp
-        AddHandler ClipboardNotifyIcon.MouseClick, AddressOf ClipboardNotifyIcon_MouseClick
-        AddHandler ExitToolStripMenuItem.Click, AddressOf ExitToolStripMenuItem_Click
-        AddHandler IsTopToolStripMenuItem.CheckedChanged, AddressOf IsTopToolStripMenuItem_CheckedChanged
+        AddHandler KeyUp,
+            AddressOf MainForm_KeyUp
+
+        AddHandler ClipboardNotifyIcon.MouseClick,
+            AddressOf ClipboardNotifyIcon_MouseClick
+
+        AddHandler ExitToolStripMenuItem.Click,
+            AddressOf ExitToolStripMenuItem_Click
+
+        AddHandler IsTopToolStripMenuItem.CheckedChanged,
+            AddressOf IsTopToolStripMenuItem_CheckedChanged
+
         KeyPreview = True
     End Sub
 
@@ -408,8 +397,8 @@ Public Class MainForm
         Dim Msg As String =
                         If(
                         IsTopToolStripMenuItem.Checked,
-                        SpecText(20),
-                        SpecText(22)
+                        SpecText(LanguageTextEnum.Top),
+                        SpecText(LanguageTextEnum.NonTop)
                         )
         Notify(Msg)
         ActionSpeech(SettingsName.SpeechTop, Msg)

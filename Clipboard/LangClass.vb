@@ -4,7 +4,7 @@
     ''' 获取显示文字
     ''' </summary>
     ''' <returns></returns>
-    Friend Shared ReadOnly Property SpecText(ByVal Index As Integer) As String
+    Friend Shared ReadOnly Property SpecText(ByVal Index As LanguageTextEnum) As String
         Get
             Return LanguageText(MainForm.Settings.Language)(Index)
         End Get
@@ -107,7 +107,8 @@
         "图像",
         "新增",
         "图像暂不支持编辑",
-        "全部"
+        "全部",
+        "监听"
         },
         New String() {
         "語音設置",
@@ -156,7 +157,8 @@
         "圖像",
         "新增",
         "圖像暫不支持編輯",
-        "全部"
+        "全部",
+        "監聽"
         },
         New String() {
         "語音設置",
@@ -205,7 +207,8 @@
         "圖像",
         "新增",
         "圖像暫不支持編輯",
-        "全部"
+        "全部",
+        "監聽"
         },
         New String() {
         "Speech Settings",
@@ -254,7 +257,8 @@
         "Image",
         "Add",
         "Image editing isn't supported for the time being",
-        "All"
+        "All",
+        "Monitorable"
         },
         New String() {
         "Speech Settings",
@@ -303,7 +307,8 @@
         "Image",
         "Add",
         "Image editing isn't supported for the time being",
-        "All"
+        "All",
+        "Monitorable"
         },
         New String() {
         "Speech Settings",
@@ -352,9 +357,61 @@
         "Image",
         "Add",
         "Image editing isn't supported for the time being",
-        "All"
+        "All",
+        "Monitorable"
         }
     }
+
+    Public Enum LanguageTextEnum
+        SpeechSettings1
+        SpeechEnabled
+        SpeechTop
+        SpeechEdit
+        SpeechCopy
+        SpeechIgnore
+        SpeechClearAll
+        SpeechSettings2
+        OtherSettings
+        IsTop
+        Language
+        Opacity
+        LanguageSelection
+        NoneSearchKeywordsTip
+        ClearAll
+        Settings
+        Edit
+        Copy
+        Ignore
+        CopySuccessfully
+        Top
+        Text
+        NonTop
+        [Exit]
+        HaveIgnored
+        HaveClearedAll
+        HaveOpenedSettings
+        EditingRecent
+        Record
+        Cancel
+        Confirm
+        Results
+        Tips
+        ConfirmLock
+        ConfirmUnlock
+        Lock
+        Unlock
+        CatastrophicFailure
+        OK
+        DeselectDate
+        SelectDate
+        Document
+        Folder
+        Image
+        Add
+        ImageEditingUnsupported
+        All
+        Monitorable
+    End Enum
 
     Public Enum Language
         ''' <summary>
