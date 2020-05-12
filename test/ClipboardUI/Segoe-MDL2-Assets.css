@@ -207,7 +207,8 @@ Modified by pinepalm
   .mdl2-people::before  { content: '\e716'; } 
   .mdl2-permissions::before  { content: '\e8d7'; } 
   .mdl2-phone::before  { content: '\e717'; } 
-  .mdl2-phone-book::before  { content: '\e780'; } 
+  .mdl2-phone-book::before  { content: '\e780'; }
+  .mdl2-photo2::before  { content: '\eb9f'; } /*pinepalm*/ 
   .mdl2-pin::before  { content: '\e718'; } 
   .mdl2-play::before  { content: '\e768'; } 
   .mdl2-post-update::before  { content: '\e8f3'; } 

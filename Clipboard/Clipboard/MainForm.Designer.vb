@@ -32,6 +32,7 @@ Partial Class MainForm
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.WebViewPanel = New System.Windows.Forms.Panel()
         Me.AddFileDialog = New System.Windows.Forms.OpenFileDialog()
+        Me.AddFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.IconContextMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -112,4 +113,5 @@ Partial Class MainForm
     Friend WithEvents WebViewPanel As Panel
     Friend WithEvents AddFileDialog As OpenFileDialog
     Friend WithEvents MonitorableToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddFolderDialog As FolderBrowserDialog
 End Class

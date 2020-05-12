@@ -61,6 +61,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Speech" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -83,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClipboardApi.vb" />
+    <Compile Include="DataActionModule.vb" />
     <Compile Include="FileModule.vb" />
     <Compile Include="INIHelper.vb" />
     <Compile Include="JsonConverter.vb" />
@@ -134,6 +138,7 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ClipboardIcon.ico" />

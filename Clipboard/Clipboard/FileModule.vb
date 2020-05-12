@@ -18,6 +18,10 @@ Module FileModule
     Friend Const OtherSec As String = "Other"
 
     Friend Const TimeFormatter As String = "yyyy/MM/dd HH:mm"
+    Friend Const TimeFormatter1 As String = "yyyy/MM/dd HH:mm:ss.fff"
+
+    Friend FileTypeId As String = Convert.ToInt32(LanguageTextEnum.Document).ToString()
+    Friend FolderTypeId As String = Convert.ToInt32(LanguageTextEnum.Folder).ToString()
 
     Friend SettingsHelper As INIHelper
 
@@ -46,11 +50,11 @@ Module FileModule
 
     Friend Function GetFileType(ByVal Path As String) As String
         If File.Exists(Path) Then
-            Return "*41"
+            Return $"*{FileTypeId}"
         ElseIf Directory.Exists(path) Then
-            Return "*42"
+            Return $"*{FolderTypeId}"
         End If
-        Return "*41"
+        Return $"*{FileTypeId}"
     End Function
 
     Private Sub ForEachInEnumerable(Of T)(ByRef Enumerable As IEnumerable(Of T), ByVal Action As Action(Of T))

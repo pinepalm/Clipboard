@@ -38,14 +38,14 @@ var dataset = new Vue({
             Edit: 2,
             Opacity: 3,
             Lock: 4,
+            AddFile: 5,
 
-            ClearAll: 5,
-            OpenSetting: 6,
-            SettingsJS: 7,
-            LanguageText: 8,
-            AddPre: 9,
-            LanguageType: 10,
-            AddFile: 11,
+            ClearAll: 6,
+            OpenSetting: 7,
+            SettingsJS: 8,
+            LanguageText: 9,
+            AddPre: 10,
+            LanguageType: 11,       
 
             SettingsNET: 12,
             EditText: 13
@@ -106,7 +106,7 @@ var dataset = new Vue({
             21: "characters",
             41: "document",
             42: "folder",
-            43: "cloud",
+            43: "photo2",
             46: "view-all"
         }
     },
@@ -164,6 +164,16 @@ var dataset = new Vue({
             if (endstr == "3") return "rd";
 
             return "th";
+        },
+        addFiles: function(fileOrfolder){
+            let addFileString = window.getCommand2(this.commandName.AddFile, fileOrfolder);
+            if (addFileString != "") {
+                let addFileNameArray = this.getFileNames(addFileString);
+                for (let i = 0; i < addFileNameArray.length; i++) {
+                    this.editFile.push(addFileNameArray[i]);
+                }
+                addFileNameArray = null;
+            }
         },
         compareDate: function (date1, date2) {
             let yearDiff = date1.getFullYear() - date2.getFullYear();
@@ -284,14 +294,10 @@ var dataset = new Vue({
             this.editFile.splice(index, 1);
         },
         onAddFile: function (event) {
-            let addFileString = window.getCommand1(this.commandName.AddFile);
-            if (addFileString != "") {
-                let addFileNameArray = this.getFileNames(addFileString);
-                for (let i = 0; i < addFileNameArray.length; i++) {
-                    this.editFile.push(addFileNameArray[i]);
-                }
-                addFileNameArray = null;
-            }
+            this.addFiles(false);
+        },
+        onAddFolder: function (event) {
+            this.addFiles(true);
         },
         onEditFileOkClick: function (event) {
             if (this.editFile.length != 0) {

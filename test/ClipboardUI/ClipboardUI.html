@@ -126,9 +126,12 @@
                         <van-icon :id="fileIndex" class="calendar" style="margin: auto 18px;" class-prefix="mdl2"
                             name="delete" :title="textShow[languageTextEnum.Ignore]" @click="onIgnoreFile"></van-icon>
                     </div>
-                    <div style="font-style: italic;" class="van-ellipsis" :title="textShow[languageTextEnum.Add]">
-                        <van-cell icon-prefix="mdl2" icon="new-folder" :border="false"
-                            :title="textShow[languageTextEnum.Add] + '…'" value="" @click="onAddFile"></van-cell>
+                    <div style="font-style: italic; display: flex; flex-direction: row; cursor: default;" class="van-ellipsis"
+                        :title="textShow[languageTextEnum.Add]">
+                        <van-cell class="addFileItem" icon-prefix="mdl2" icon="open-file" :title="textShow[languageTextEnum.Add] + '…'"
+                            value="" @click="onAddFile"></van-cell>
+                        <van-cell class="addFileItem" icon-prefix="mdl2" icon="new-folder" :title="textShow[languageTextEnum.Add] + '…'"
+                            value="" @click="onAddFolder"></van-cell>
                     </div>
                 </div>
                 <van-button style="width: 100%; align-self: flex-end;" square type="primary" @click="onEditFileOkClick">

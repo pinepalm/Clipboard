@@ -99,6 +99,7 @@ Public Class ClipboardApi
         Edit
         Opacity
         Lock
+        AddFile
 
         ClearAll
         OpenSetting
@@ -106,7 +107,6 @@ Public Class ClipboardApi
         LanguageText
         AddPre
         LanguageType
-        AddFile
 
         SettingsNET
         EditText
