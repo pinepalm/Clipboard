@@ -168,7 +168,7 @@ Module FileModule
         Try
             Using SeriStream As Stream = File.Open(DATPath, FileMode.Create)
                 Dim BinFormatter As New BinaryFormatter
-                BinFormatter.Serialize(SeriStream, MainForm.DataList)
+                BinFormatter.Serialize(SeriStream, DataList)
                 SeriStream.Flush()
                 SeriStream.Close()
                 BinFormatter = Nothing
@@ -185,7 +185,7 @@ Module FileModule
     Friend Sub ReadSeriFile()
 
         If Not File.Exists(DATPath) Then
-            MainForm.DataList = New List(Of DataTag)
+            DataList = New List(Of DataTag)
             UpdateSeriFile()
             Return
         End If
@@ -194,7 +194,7 @@ Module FileModule
             Using SeriStream As Stream = File.Open(DATPath, FileMode.Open)
                 Dim BinFormatter As New BinaryFormatter
 
-                MainForm.DataList = BinFormatter.Deserialize(SeriStream)  'Result
+                DataList = BinFormatter.Deserialize(SeriStream)  'Result
 
                 SeriStream.Close()
                 BinFormatter = Nothing

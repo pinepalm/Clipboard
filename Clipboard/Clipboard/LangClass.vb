@@ -6,7 +6,7 @@
     ''' <returns></returns>
     Friend Shared ReadOnly Property SpecText(ByVal Index As LanguageTextEnum) As String
         Get
-            Return LanguageText(MainForm.Settings.Language)(Index)
+            Return LanguageText(Settings.Language)(Index)
         End Get
     End Property
 
@@ -19,7 +19,7 @@
         Get
             Dim NumStr As String = Number.ToString()
 
-            Select Case MainForm.Settings.Language
+            Select Case Settings.Language
                 Case 0 To 2
 
                     Return NumStr

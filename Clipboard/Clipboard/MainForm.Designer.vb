@@ -25,93 +25,41 @@ Partial Class MainForm
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
         Me.ClipboardNotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
-        Me.IconContextMenuStrip = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.MonitorableToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.IsTopToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.WebViewPanel = New System.Windows.Forms.Panel()
         Me.AddFileDialog = New System.Windows.Forms.OpenFileDialog()
-        Me.AddFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
-        Me.IconContextMenuStrip.SuspendLayout()
         Me.SuspendLayout()
         '
         'ClipboardNotifyIcon
         '
-        Me.ClipboardNotifyIcon.ContextMenuStrip = Me.IconContextMenuStrip
         Me.ClipboardNotifyIcon.Text = "Clipboard"
         Me.ClipboardNotifyIcon.Visible = True
-        '
-        'IconContextMenuStrip
-        '
-        Me.IconContextMenuStrip.ImageScalingSize = New System.Drawing.Size(20, 20)
-        Me.IconContextMenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MonitorableToolStripMenuItem, Me.IsTopToolStripMenuItem, Me.ToolStripSeparator1, Me.ExitToolStripMenuItem})
-        Me.IconContextMenuStrip.Name = "IconContextMenuStrip"
-        Me.IconContextMenuStrip.Size = New System.Drawing.Size(132, 88)
-        '
-        'MonitorableToolStripMenuItem
-        '
-        Me.MonitorableToolStripMenuItem.Checked = True
-        Me.MonitorableToolStripMenuItem.CheckOnClick = True
-        Me.MonitorableToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.MonitorableToolStripMenuItem.Name = "MonitorableToolStripMenuItem"
-        Me.MonitorableToolStripMenuItem.Size = New System.Drawing.Size(131, 26)
-        Me.MonitorableToolStripMenuItem.Text = "监听(&L)"
-        '
-        'IsTopToolStripMenuItem
-        '
-        Me.IsTopToolStripMenuItem.CheckOnClick = True
-        Me.IsTopToolStripMenuItem.Name = "IsTopToolStripMenuItem"
-        Me.IsTopToolStripMenuItem.Size = New System.Drawing.Size(131, 26)
-        Me.IsTopToolStripMenuItem.Text = "置顶(&T)"
-        '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(128, 6)
-        '
-        'ExitToolStripMenuItem
-        '
-        Me.ExitToolStripMenuItem.Image = CType(resources.GetObject("ExitToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(131, 26)
-        Me.ExitToolStripMenuItem.Text = "退出(&E)"
         '
         'WebViewPanel
         '
         Me.WebViewPanel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.WebViewPanel.Location = New System.Drawing.Point(0, 0)
         Me.WebViewPanel.Name = "WebViewPanel"
-        Me.WebViewPanel.Size = New System.Drawing.Size(482, 762)
+        Me.WebViewPanel.Size = New System.Drawing.Size(567, 1055)
         Me.WebViewPanel.TabIndex = 1
         '
         'AddFileDialog
         '
-        Me.AddFileDialog.Filter = "All files (*.*)|*.*"
         Me.AddFileDialog.Multiselect = True
         '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(482, 762)
+        Me.ClientSize = New System.Drawing.Size(567, 1055)
         Me.Controls.Add(Me.WebViewPanel)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MinimumSize = New System.Drawing.Size(500, 809)
         Me.Name = "MainForm"
         Me.Text = "Clipboard"
-        Me.IconContextMenuStrip.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents ClipboardNotifyIcon As NotifyIcon
-    Friend WithEvents IconContextMenuStrip As ContextMenuStrip
-    Friend WithEvents ExitToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents IsTopToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents WebViewPanel As Panel
     Friend WithEvents AddFileDialog As OpenFileDialog
-    Friend WithEvents MonitorableToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents AddFolderDialog As FolderBrowserDialog
 End Class

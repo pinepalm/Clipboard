@@ -9,6 +9,8 @@ Public Class ClipboardApi
     Public Const SHCORE As String = "SHCore.dll"
     Public Const KERNEL32 As String = "Kernel32.dll"
     Public Const SHELL32 As String = "Shell32.dll"
+    Public Const UXTHEME As String = "Uxtheme.dll"
+    Public Const THEME As String = "theme.dll"
 
     ''' <summary>
     ''' 数据对象
@@ -16,10 +18,9 @@ Public Class ClipboardApi
     ''' <remarks></remarks>
     <Serializable>
     Public Class DataTag
-        Public type As Integer
+        Public type As String
         Public time As String
         Public text As String
-        Public id As String
         Public key As String
         Public lock As Boolean
     End Class
@@ -58,6 +59,31 @@ Public Class ClipboardApi
     End Structure
 
 #Region "Enum"
+
+    Public Enum HRESULT
+        S_OK = &H0
+        S_FALSE = &H1
+        E_INVALIDARG = CInt(&H80070057)
+        E_OUTOFMEMORY = CInt(&H8007000E)
+        E_NOINTERFACE = CInt(&H80004002)
+        E_FAIL = CInt(&H80004005)
+        E_ELEMENTNOTFOUND = CInt(&H80070490)
+        TYPE_E_ELEMENTNOTFOUND = CInt(&H8002802B)
+        NO_OBJECT = CInt(&H800401E5)
+        WIN32ERROR_CANCELLED = 1223
+        ERROR_CANCELLED = CInt(&H800704C7)
+        RESOURCEINUSE = CInt(&H800700AA)
+        ACCESSDENIED = CInt(&H80030005)
+    End Enum
+
+    Public Enum PreferredAppMode
+        [Default]
+        AllowDark
+        ForceDark
+        ForceLight
+        Max
+    End Enum
+
     Public Enum NotifyIconInfoFlag
         NIIF_NONE = &H0
         NIIF_INFO = &H1
@@ -177,6 +203,9 @@ Public Class ClipboardApi
 
         WM_CLOSE = &H10
 
+        WM_THEMECHANGED = &H31A
+
+        WM_SETTINGCHANGE = &H1A
     End Enum
     Public Enum ClipboardMsg
 
@@ -333,19 +362,19 @@ Public Class ClipboardApi
     Public Shared Function AddClipboardFormatListener(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function ChangeClipboardChain(ByVal hWndRemove As IntPtr, ByVal hWndNewNext As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function CloseClipboard() As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function EmptyClipboard() As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function OpenClipboard(ByVal hWndNewOwner As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
@@ -353,15 +382,15 @@ Public Class ClipboardApi
     Public Shared Function RemoveClipboardFormatListener(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function SetClipboardViewer(ByVal hWndNewViewer As IntPtr) As IntPtr
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function GetClipboardViewer() As IntPtr
     End Function
 
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function GetOpenClipboardWindow() As IntPtr
     End Function
 
@@ -372,7 +401,7 @@ Public Class ClipboardApi
     <DllImport(USER32, SetLastError:=True)>
     Public Shared Function SetProcessDpiAwarenessContext(ByVal dpiFlag As Integer) As Boolean
     End Function
-    <DllImport(USER32)>
+    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function SetProcessDPIAware() As Boolean
     End Function
 
@@ -380,16 +409,59 @@ Public Class ClipboardApi
     Public Shared Function SetProcessDpiAwareness(ByVal awareness As PROCESS_DPI_AWARENESS) As Boolean
     End Function
 
-    <DllImport(KERNEL32)>
+    <DllImport(KERNEL32, SetLastError:=True)>
     Public Shared Function GetPrivateProfileString(ByVal lpAppName As String, ByVal lpKeyName As String, ByVal lpDefault As String, ByVal lpReturnedString As StringBuilder, ByVal nSize As Integer, ByVal lpFileName As String) As Integer
     End Function
 
-    <DllImport(KERNEL32)>
+    <DllImport(KERNEL32, SetLastError:=True)>
     Public Shared Function WritePrivateProfileString(ByVal lpApplicationName As String, ByVal lpKeyName As String, ByVal lpString As String, ByVal lpFileName As String) As Integer
     End Function
 
-    <DllImport(SHELL32)>
+    <DllImport(SHELL32, SetLastError:=True)>
     Public Shared Function Shell_NotifyIcon(ByVal dwMessage As NotifyIconMessage, ByRef lpData As NotifyIconData) As Boolean
+    End Function
+
+    <DllImport(UXTHEME, SetLastError:=True, ExactSpelling:=True, CharSet:=CharSet.Unicode)>
+    Public Shared Function SetWindowTheme(ByVal hWnd As IntPtr, ByVal pszSubAppName As String, ByVal pszSubIdList As String) As Integer
+    End Function
+
+    ''' <summary>
+    ''' 设置操作的窗体句柄
+    ''' </summary>
+    ''' <param name="hWnd">窗体句柄</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    <DllImport(THEME, SetLastError:=True)>
+    Public Shared Function SetWindowHandle(ByVal hWnd As IntPtr) As HRESULT
+    End Function
+
+    ''' <summary>
+    ''' 设置窗体主题（暂只有<see cref="PreferredAppMode.[Default]"/>亮白主题和其它暗黑主题）
+    ''' </summary>
+    ''' <param name="Mode">主题选择</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    <DllImport(THEME, SetLastError:=True)>
+    Public Shared Function SetThemeMode(ByVal Mode As PreferredAppMode) As HRESULT
+    End Function
+
+    ''' <summary>
+    ''' 按系统主题更新
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    <DllImport(THEME, SetLastError:=True)>
+    Public Shared Function UpdateThemeMode() As HRESULT
+    End Function
+
+    ''' <summary>
+    ''' 按<see cref="WindowMsg.WM_SETTINGCHANGE"/>接收到的信息选择更新主题（与系统主题一致）
+    ''' </summary>
+    ''' <param name="lParam">窗口信息</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    <DllImport(THEME, SetLastError:=True)>
+    Public Shared Function UpdateThemeModeWithMsg(ByVal lParam As IntPtr) As HRESULT
     End Function
 
 #End Region

@@ -120,30 +120,10 @@
   <metadata name="ClipboardNotifyIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <metadata name="IconContextMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>223, 17</value>
+  <metadata name="AddFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>234, 19</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="ExitToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1
-        MAAA6mAAADqYAAAXb5JfxUYAAAAJcEhZcwAACxMAAAsTAQCanBgAAAHTSURBVHhe7ZnhaexADISviFSQ
-        Gq6pqyhFpYbr4HpwMsYGecaJwdaudKwCXyDfsDppIO/9yG2apg2/X/gWBu/TGhW0UG94n9aooIV6w/u0
-        RgUt1BvepzUqghfqjYoqoAqoAqqAKqAKqAKqgCogbwGv1+tjz59BRfICHo/H1/1+//YqQUXiAnD8updX
-        CSqWD1jhPAoci6Ptbh4lqDAfADiPpEUJKsxwwHk03iWoMIMB5xnwLEGFGQo4z4JXCSrMQMB5JjxKUGGG
-        Ac6zcbUEFWYQ4DwjV0pQYYYAzrNytgQVZgDgPDNnSlBhHgPOs7OUsLnhvxJUmIeA8yP4fRb+KmHzwyzo
-        IedH8PtM7JWwWX4W9IjzI/h9JlDA8/n83Oxrf5gFPeL8CH6fhW6/AtGE/yMYyXL8mP8NnjkeqDADAOcZ
-        OXs8UGGGAM6zceV4oMIMApxn4urxQIUZBjjPgsfxQIUZCDjPgNfxQIUZCjiPxvN4oMIMBpxH4n08UGGG
-        A86jaHE8UGE+AHAeydB/GlsZ+o+jK17HAxVvUIAnKqqAKqAKqAKqgCqgCqgCqoAYeJ/WqKCFesP7tEYF
-        LdQb3qc1Kmih3vA+rdmVI7ErR2JXjsSuHIfp9gOaqBku0yfDtAAAAABJRU5ErkJggg==
-</value>
-  </data>
-  <metadata name="AddFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>446, 17</value>
-  </metadata>
-  <metadata name="AddFolderDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>607, 17</value>
-  </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAMAQEAAAAEAIAAoQgAANgAAACAgAAABACAAqBAAAF5CAAAQEAAAAQAgAGgEAAAGUwAAKAAAAEAA

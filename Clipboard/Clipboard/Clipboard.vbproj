@@ -89,6 +89,7 @@
     <Compile Include="DataActionModule.vb" />
     <Compile Include="FileModule.vb" />
     <Compile Include="INIHelper.vb" />
+    <Compile Include="InteractionModule.vb" />
     <Compile Include="JsonConverter.vb" />
     <Compile Include="LangClass.vb" />
     <Compile Include="MainForm.vb">
@@ -115,6 +116,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="SpeechModule.vb" />
+    <Compile Include="VistaFolderBrowserDialog.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
