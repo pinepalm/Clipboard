@@ -26,9 +26,7 @@ Public Class MainForm
                 LogRecord("END")
             '收到剪贴板更新
             Case ClipboardMsg.WM_CLIPBOARDUPDATE
-                If MonitorableMenuItem.Checked Then
-                    AddRecord()
-                End If
+                AddRecord()
 
             Case WindowMsg.WM_SETTINGCHANGE
                 UpdateThemeModeWithMsg(m.LParam)

@@ -8,7 +8,6 @@ Public Class ClipboardApi
     Public Const USER32 As String = "User32.dll"
     Public Const SHCORE As String = "SHCore.dll"
     Public Const KERNEL32 As String = "Kernel32.dll"
-    Public Const SHELL32 As String = "Shell32.dll"
     Public Const UXTHEME As String = "Uxtheme.dll"
     Public Const THEME As String = "theme.dll"
 
@@ -36,28 +35,6 @@ Public Class ClipboardApi
         Public Language As Language     '9
     End Structure
 
-    <StructLayout(LayoutKind.Sequential)>
-    Public Structure NotifyIconData
-        Public cbSize As Integer
-        Public hWnd As IntPtr
-        Public uID As UInteger
-        Public uFlags As NotifyIconFlag
-        Public uCallbackMessage As UInteger
-        Public hIcon As IntPtr
-        <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=128)>
-        Public szTip As String
-        Public dwState As Integer
-        Public dwStateMask As Integer
-        <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=256)>
-        Public szInfo As String
-        Public uTimeoutOrVersion As UInteger
-        <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=64)>
-        Public szInfoTitle As String
-        Public dwInfoFlags As NotifyIconInfoFlag
-        Public guidItem As Guid
-        Public hBalloonIcon As IntPtr
-    End Structure
-
 #Region "Enum"
 
     Public Enum HRESULT
@@ -82,37 +59,6 @@ Public Class ClipboardApi
         ForceDark
         ForceLight
         Max
-    End Enum
-
-    Public Enum NotifyIconInfoFlag
-        NIIF_NONE = &H0
-        NIIF_INFO = &H1
-        NIIF_WARNING = &H2
-        NIIF_ERROR = &H3
-        NIIF_USER = &H4
-        NIIF_NOSOUND = &H10
-        NIIF_LARGE_ICON = &H20
-        NIIF_RESPECT_QUIET_TIME = &H80
-        NIIF_ICON_MASK = &HF
-    End Enum
-
-    Public Enum NotifyIconFlag As UInteger
-        NIF_MESSAGE = &H1
-        NIF_ICON = &H2
-        NIF_TIP = &H4
-        NIF_STATE = &H8
-        NIF_INFO = &H10
-        NIF_GUID = &H20
-        NIF_REALTIME = &H40
-        NIF_SHOWTIP = &H80
-    End Enum
-
-    Public Enum NotifyIconMessage
-        NIM_ADD = &H0
-        NIM_MODIFY = &H1
-        NIM_DELETE = &H2
-        NIM_SETFOCUS = &H3
-        NIM_SETVERSION = &H4
     End Enum
 
     ''' <summary>
@@ -243,155 +189,16 @@ Public Class ClipboardApi
 
     End Enum
 
-    Public Enum StdClipboardFormats
-        ''' <summary>
-        ''' A handle To a bitmap (HBITMAP).
-        ''' </summary>
-        CF_BITMAP = 2
-        ''' <summary>
-        ''' A memory Object containing a BITMAPINFO Structure followed by the bitmap bits.
-        ''' </summary>
-        CF_DIB = 8
-        ''' <summary>
-        ''' A memory Object containing a BITMAPV5HEADER Structure followed by the bitmap color space information And the bitmap bits.
-        ''' </summary>
-        CF_DIBV5 = 17
-        ''' <summary>
-        ''' Software Arts' Data Interchange Format.
-        ''' </summary>
-        CF_DIF = 5
-        ''' <summary>
-        ''' Bitmap display format associated With a Private format. The hMem parameter must be a handle To data that can be displayed In bitmap format In lieu Of the privately formatted data.
-        ''' </summary>
-        CF_DSPBITMAP = &H82
-        ''' <summary>
-        ''' Enhanced metafile display format associated With a Private format. The hMem parameter must be a handle To data that can be displayed In enhanced metafile format In lieu Of the privately formatted data.
-        ''' </summary>
-        CF_DSPENHMETAFILE = &H8E
-        ''' <summary>
-        ''' Metafile-picture display format associated With a Private format. The hMem parameter must be a handle To data that can be displayed In metafile-picture format In lieu Of the privately formatted data.
-        ''' </summary>
-        CF_DSPMETAFILEPICT = &H83
-        ''' <summary>
-        ''' Text display format associated With a Private format. The hMem parameter must be a handle To data that can be displayed In text format In lieu Of the privately formatted data.
-        ''' </summary>
-        CF_DSPTEXT = &H81
-        ''' <summary>
-        ''' A handle To an enhanced metafile (HENHMETAFILE).
-        ''' </summary>
-        CF_ENHMETAFILE = 14
-        ''' <summary>
-        ''' Start Of a range Of Integer values For application-defined GDI Object clipboard formats. The End Of the range Is CF_GDIOBJLAST.Handles associated with clipboard formats in this range are Not automatically deleted using the GlobalFree function when the clipboard Is emptied. Also, when using values in this range, the hMem parameter Is Not a handle to a GDI object, but Is a handle allocated by the GlobalAlloc function with the GMEM_MOVEABLE flag.
-        ''' </summary>
-        CF_GDIOBJFIRST = &H300
-        ''' <summary>
-        ''' See CF_GDIOBJFIRST.
-        ''' </summary>
-        CF_GDIOBJLAST = &H3FF
-        ''' <summary>
-        ''' A handle To type HDROP that identifies a list Of files. An application can retrieve information about the files by passing the handle To the DragQueryFile Function.
-        ''' </summary>
-        CF_HDROP = 15
-        ''' <summary>
-        ''' The data Is a handle To the locale identifier associated With text In the clipboard. When you close the clipboard, If it contains CF_TEXT data but no CF_LOCALE data, the system automatically sets the CF_LOCALE format To the current input language. You can use the CF_LOCALE format To associate a different locale With the clipboard text. 
-        ''' An application that pastes text from the clipboard can retrieve this format To determine which character Set was used To generate the text.
-        ''' Note that the clipboard does Not support plain text In multiple character sets. To achieve this, use a formatted text data type such As RTF instead.
-        ''' The system uses the code page associated With CF_LOCALE To implicitly convert from CF_TEXT To CF_UNICODETEXT. Therefore, the correct code page table Is used For the conversion.
-        ''' </summary>
-        CF_LOCALE = 16
-        ''' <summary>
-        ''' Handle To a metafile picture format As defined by the METAFILEPICT Structure. When passing a CF_METAFILEPICT handle by means Of DDE, the application responsible For deleting hMem should also free the metafile referred To by the CF_METAFILEPICT handle.
-        ''' </summary>
-        CF_METAFILEPICT = 3
-        ''' <summary>
-        ''' Text format containing characters In the OEM character Set. Each line ends With a carriage Return/linefeed (CR-LF) combination. A null character signals the End Of the data.
-        ''' </summary>
-        CF_OEMTEXT = 7
-        ''' <summary>
-        ''' Owner-display format. The clipboard owner must display And update the clipboard viewer window, And receive the WM_ASKCBFORMATNAME, WM_HSCROLLCLIPBOARD, WM_PAINTCLIPBOARD, WM_SIZECLIPBOARD, And WM_VSCROLLCLIPBOARD messages. The hMem parameter must be NULL.
-        ''' </summary>
-        CF_OWNERDISPLAY = &H80
-        ''' <summary>
-        ''' Handle To a color palette. Whenever an application places data In the clipboard that depends On Or assumes a color palette, it should place the palette On the clipboard As well.
-        ''' If the clipboard contains data In the CF_PALETTE (logical color palette) format, the application should use the SelectPalette And RealizePalette functions To realize (compare) any other data In the clipboard against that logical palette.
-        ''' When displaying clipboard data, the clipboard always uses as its current palette any object on the clipboard that Is in the CF_PALETTE format.
-        ''' </summary>
-        CF_PALETTE = 9
-        ''' <summary>
-        ''' Data For the pen extensions To the Microsoft Windows For Pen Computing.
-        ''' </summary>
-        CF_PENDATA = 10
-        ''' <summary>
-        ''' Start Of a range Of Integer values For Private clipboard formats. The range ends With CF_PRIVATELAST. Handles associated With Private clipboard formats are Not freed automatically; the clipboard owner must free such Handles, typically In response To the WM_DESTROYCLIPBOARD message.
-        ''' </summary>
-        CF_PRIVATEFIRST = &H200
-        ''' <summary>
-        ''' See CF_PRIVATEFIRST.
-        ''' </summary>
-        CF_PRIVATELAST = &H2FF
-        ''' <summary>
-        ''' Represents audio data more complex than can be represented In a CF_WAVE standard wave format.
-        ''' </summary>
-        CF_RIFF = 11
-        ''' <summary>
-        ''' Microsoft Symbolic Link (SYLK) format.
-        ''' </summary>
-        CF_SYLK = 4
-        ''' <summary>
-        ''' Text format. Each line ends With a carriage Return/linefeed (CR-LF) combination. A null character signals the End Of the data. Use this format For ANSI text.
-        ''' </summary>
-        CF_TEXT = 1
-        ''' <summary>
-        ''' Tagged-image file format.
-        ''' </summary>
-        CF_TIFF = 6
-        ''' <summary>
-        ''' Unicode text format. Each line ends With a carriage Return/linefeed (CR-LF) combination. A null character signals the End Of the data.
-        ''' </summary>
-        CF_UNICODETEXT = 13
-        ''' <summary>
-        ''' Represents audio data In one Of the standard wave formats, such As 11 kHz Or 22 kHz PCM.
-        ''' </summary>
-        CF_WAVE = 12
-    End Enum
-
 #End Region
 
 #Region "Win32Api"
+
     <DllImport(USER32, SetLastError:=True)>
     Public Shared Function AddClipboardFormatListener(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
 
     <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function ChangeClipboardChain(ByVal hWndRemove As IntPtr, ByVal hWndNewNext As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function CloseClipboard() As <MarshalAs(UnmanagedType.Bool)> Boolean
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function EmptyClipboard() As <MarshalAs(UnmanagedType.Bool)> Boolean
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function OpenClipboard(ByVal hWndNewOwner As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
     Public Shared Function RemoveClipboardFormatListener(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function SetClipboardViewer(ByVal hWndNewViewer As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function GetClipboardViewer() As IntPtr
-    End Function
-
-    <DllImport(USER32, SetLastError:=True)>
-    Public Shared Function GetOpenClipboardWindow() As IntPtr
     End Function
 
     <DllImport(USER32, SetLastError:=True)>
@@ -401,6 +208,7 @@ Public Class ClipboardApi
     <DllImport(USER32, SetLastError:=True)>
     Public Shared Function SetProcessDpiAwarenessContext(ByVal dpiFlag As Integer) As Boolean
     End Function
+
     <DllImport(USER32, SetLastError:=True)>
     Public Shared Function SetProcessDPIAware() As Boolean
     End Function
@@ -415,10 +223,6 @@ Public Class ClipboardApi
 
     <DllImport(KERNEL32, SetLastError:=True)>
     Public Shared Function WritePrivateProfileString(ByVal lpApplicationName As String, ByVal lpKeyName As String, ByVal lpString As String, ByVal lpFileName As String) As Integer
-    End Function
-
-    <DllImport(SHELL32, SetLastError:=True)>
-    Public Shared Function Shell_NotifyIcon(ByVal dwMessage As NotifyIconMessage, ByRef lpData As NotifyIconData) As Boolean
     End Function
 
     <DllImport(UXTHEME, SetLastError:=True, ExactSpelling:=True, CharSet:=CharSet.Unicode)>

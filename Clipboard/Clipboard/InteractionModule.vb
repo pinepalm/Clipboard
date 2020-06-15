@@ -15,6 +15,9 @@ Module InteractionModule
     Friend WithEvents IsTopMenuItem As MenuItem         '置顶菜单项
     Friend WithEvents SeparatorMenuItem As MenuItem     '分隔菜单项
     Friend WithEvents ExitMenuItem As MenuItem          '退出菜单项
+
+    Friend WithEvents MonitorableAllMenuItem As MenuItem
+    Friend MonitorableMenuItems As MenuItem()           '监控菜单子项
 #End Region
 
     Friend AddFolderDialog As VistaFolderBrowserDialog  'Vista样式文件选择对话框
@@ -22,12 +25,9 @@ Module InteractionModule
     Friend Settings As Settings                         '设置结构
     Friend innerData As Integer = -1                    '解决复制时两次更新出现复制两次的情况
     Friend CloseFlag As Boolean = False                 '点击右上角关闭按钮最小化到托盘
+    Friend AllDisabled As Integer = 1                   '监控子项是否全未开启
 
-    Friend Sub Initialize()
-        MainForm.Size = New Size(442, 884)
-        MainForm.MinimumSize = New Size(400, 400)
-        AddFolderDialog = New VistaFolderBrowserDialog()
-        '读取设置
+    Private Sub LoadSettings()
         CheckUiDirectory(ClipboardUIDirName, Sub()
                                                  LogRecord("UI FILE IS MISSING")
                                                  MessageBox.Show(SpecText(LanguageTextEnum.CatastrophicFailure), MainForm.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -38,14 +38,68 @@ Module InteractionModule
                                         End Sub)
         SettingsHelper = New INIHelper(INIPath)
         Settings = ReadSettings()
-        MainForm.Opacity = Settings.Opacity / 100
-        MainForm.AddFileDialog.Title = SpecText(LanguageTextEnum.Add)
-        AddFolderDialog.Title = SpecText(LanguageTextEnum.Add)
+    End Sub
 
-        MonitorableMenuItem = New MenuItem With {
-            .Text = $"{SpecText(LanguageTextEnum.Monitorable)}(&L)",
+    Friend Sub ForEachMonitorableMenuItem(ByVal Action As Action(Of MenuItem))
+        For Each Item As MenuItem In MonitorableMenuItems
+            Action(Item)
+        Next
+    End Sub
+
+    Private Sub AddEventHandler()
+        AddHandler MainForm.KeyUp,
+            AddressOf MainForm_KeyUp
+
+        AddHandler MainForm.ClipboardNotifyIcon.MouseClick,
+            AddressOf ClipboardNotifyIcon_MouseClick
+
+        AddHandler ExitMenuItem.Click,
+            AddressOf ExitMenuItem_Click
+
+        AddHandler IsTopMenuItem.Click,
+            AddressOf IsTopMenuItem_Click
+
+        AddHandler MonitorableAllMenuItem.Click,
+            AddressOf MonitorableAllMenuItem_Click
+
+        ForEachMonitorableMenuItem(Sub(ByVal Item As MenuItem)
+                                       AddHandler Item.Click,
+                                            AddressOf MonitorableMenuItem_Click
+                                   End Sub)
+    End Sub
+
+    Private Sub InitDynamicControls()
+        AddFolderDialog = New VistaFolderBrowserDialog With {
+            .Title = SpecText(LanguageTextEnum.Add)
+        }
+        MainForm.AddFileDialog.Title = SpecText(LanguageTextEnum.Add)
+
+        MonitorableAllMenuItem = New MenuItem With {
+            .Text = SpecText(LanguageTextEnum.All),
             .Checked = True
         }
+        MonitorableMenuItems = New MenuItem() {
+            New MenuItem With {
+                .Text = SpecText(LanguageTextEnum.Text),
+                .Tag = New Object() {LanguageTextEnum.Text, DataFormats.Text},
+                .Checked = True
+            },
+            New MenuItem With {
+                .Text = SpecText(LanguageTextEnum.Document),
+                .Tag = New Object() {LanguageTextEnum.Document, DataFormats.FileDrop},
+                .Checked = True
+            },
+            New MenuItem With {
+                .Text = SpecText(LanguageTextEnum.Image),
+                .Tag = New Object() {LanguageTextEnum.Image, DataFormats.Bitmap},
+                .Checked = True
+            }
+        }
+        MonitorableMenuItem = New MenuItem With {
+            .Text = SpecText(LanguageTextEnum.Monitorable)
+        }
+        MonitorableMenuItem.MenuItems.Add(MonitorableAllMenuItem)
+        MonitorableMenuItem.MenuItems.AddRange(MonitorableMenuItems)
         IsTopMenuItem = New MenuItem With {
             .Text = $"{SpecText(LanguageTextEnum.IsTop)}(&T)",
             .Checked = Settings.IsTop
@@ -82,24 +136,20 @@ Module InteractionModule
         InitClipboardUI()
 
         AddEventHandler()
-        MainForm.KeyPreview = True
+
     End Sub
 
-    Friend Sub AddEventHandler()
-        AddHandler MainForm.KeyUp,
-            AddressOf MainForm_KeyUp
+    Private Sub InitMainForm()
+        MainForm.Size = New Size(442, 884)
+        MainForm.MinimumSize = New Size(400, 400)
+        MainForm.Opacity = Settings.Opacity / 100
+        MainForm.KeyPreview = True
+        InitDynamicControls()
+    End Sub
 
-        AddHandler MainForm.ClipboardNotifyIcon.MouseClick,
-            AddressOf ClipboardNotifyIcon_MouseClick
-
-        AddHandler ExitMenuItem.Click,
-            AddressOf ExitMenuItem_Click
-
-        AddHandler IsTopMenuItem.Click,
-            AddressOf IsTopMenuItem_Click
-
-        AddHandler MonitorableMenuItem.Click,
-            AddressOf MonitorableMenuItem_Click
+    Friend Sub Initialize()
+        LoadSettings()
+        InitMainForm()
     End Sub
 
     Friend Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs)
@@ -154,8 +204,35 @@ Module InteractionModule
         AdjustIsTop(Not IsTopMenuItem.Checked)
     End Sub
 
+    Friend Sub MonitorableAllMenuItem_Click(sender As Object, e As EventArgs)
+        MonitorableAllMenuItem.Checked = Not MonitorableAllMenuItem.Checked
+        If AllDisabled = 0 Then
+            ForEachMonitorableMenuItem(Sub(ByVal Item As MenuItem)
+                                           Item.Enabled = MonitorableAllMenuItem.Checked
+                                           Item.Checked = True
+                                       End Sub)
+            AllDisabled = 1
+        Else
+            ForEachMonitorableMenuItem(Sub(ByVal Item As MenuItem)
+                                           Item.Enabled = MonitorableAllMenuItem.Checked
+                                       End Sub)
+        End If
+    End Sub
+
     Friend Sub MonitorableMenuItem_Click(sender As Object, e As EventArgs)
-        MonitorableMenuItem.Checked = Not MonitorableMenuItem.Checked
+        AllDisabled = 0
+        sender.Checked = Not sender.Checked
+        ForEachMonitorableMenuItem(Sub(ByVal Item As MenuItem)
+                                       AllDisabled += Convert.ToInt32(Item.Checked)
+                                   End Sub)
+        If AllDisabled = 0 Then
+            MonitorableAllMenuItem.Checked = False
+            ForEachMonitorableMenuItem(Sub(ByVal Item As MenuItem)
+                                           Item.Enabled = False
+                                       End Sub)
+        Else
+            AllDisabled = 1
+        End If
     End Sub
 
 #End Region
@@ -190,20 +267,29 @@ Module InteractionModule
             Return
         End If
 
-        Dim iData As IDataObject = Windows.Forms.Clipboard.GetDataObject()
-        If iData IsNot Nothing Then
-            For Each Item As (
-                Format As String,
-                AddAction As Action(Of IDataObject),
-                CopyAction As Action(Of Integer),
-                IgnoreAction As Action(Of Integer),
-                EditAction As Action(Of Integer)
-                ) In ActionWithFormat
-                If iData.GetDataPresent(Item.Format) Then
-                    Item.AddAction(iData)
-                    Exit For
-                End If
-            Next
+        If MonitorableAllMenuItem.Checked Then
+            Dim iData As IDataObject = Windows.Forms.Clipboard.GetDataObject()
+            If iData IsNot Nothing Then
+                For Each Item As (
+                    Format As String,
+                    AddAction As Action(Of IDataObject),
+                    CopyAction As Action(Of Integer),
+                    IgnoreAction As Action(Of Integer),
+                    EditAction As Action(Of Integer)
+                    ) In ActionWithFormat
+                    If iData.GetDataPresent(Item.Format) Then
+                        For Each CheckItem As MenuItem In MonitorableMenuItems
+                            If CheckItem.Tag(1) = Item.Format Then
+                                If CheckItem.Checked Then
+                                    Item.AddAction(iData)
+                                End If
+                                Exit For
+                            End If
+                        Next
+                        Exit For
+                    End If
+                Next
+            End If
         End If
     End Sub
 
@@ -211,159 +297,33 @@ Module InteractionModule
 
 #Region "Js -> Net"
 
-    Public Function getCommand1(ByVal jsExecState As IntPtr, ByVal param As IntPtr) As Long
+#Disable Warning IDE0060 ' 删除未使用的参数
+    Private Function getCommand(ByVal jsExecState As IntPtr, ByVal param As IntPtr) As Long
+#Enable Warning IDE0060 ' 删除未使用的参数
+
         '获取参数命令
         Dim Command As CommandName = JsValue.Arg(jsExecState, 0).ToInt32(jsExecState)
-        Select Case Command
-            Case CommandName.ClearAll
-                DataList.Clear()
-                UpdateSeriFile()
-                DeleteFolderContent(ImageDataPath)
-                ActionSpeech(SettingsName.SpeechClearall, SpecText(LanguageTextEnum.HaveClearedAll))
+        For Each Cmd As (
+            CmdName As CommandName,
+            CmdFunc As Func(Of IntPtr, JsValue)
+            ) In FuncWithCmd
+            If Command = Cmd.CmdName Then
+                Return Cmd.CmdFunc(jsExecState)
+            End If
+        Next
+        Return JsValue.UndefinedValue
+    End Function
 
-                Return JsValue.UndefinedValue
-
-            Case CommandName.OpenSetting
-                ActionSpeech(SettingsName.SpeechSetting, SpecText(LanguageTextEnum.HaveOpenedSettings))
-
-                Return JsValue.UndefinedValue
-
-            Case CommandName.SettingsJS
-                Return JsValue.StringValue(jsExecState, Object2Json(Settings))
-
-            Case CommandName.LanguageText
-                Return JsValue.StringValue(jsExecState, Object2Json(LanguageText(Settings.Language)))
-
-            Case CommandName.AddPre
-                Return JsValue.StringValue(jsExecState, Object2Json(DataList))
-
-            Case CommandName.LanguageType
-                Return JsValue.StringValue(jsExecState, Object2Json(LanguageType))
-
-            Case Else
-                Return JsValue.UndefinedValue
-
-        End Select
+    Public Function getCommand1(ByVal jsExecState As IntPtr, ByVal param As IntPtr) As Long
+        Return getCommand(jsExecState, param)
     End Function
 
     Public Function getCommand2(ByVal jsExecState As IntPtr, ByVal param As IntPtr) As Long
-        '获取参数命令
-        Dim Command As CommandName = JsValue.Arg(jsExecState, 0).ToInt32(jsExecState)
-        Select Case Command
-            Case CommandName.Copy
-                Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                innerData = 1
-                For Each Item As (
-                Format As String,
-                AddAction As Action(Of IDataObject),
-                CopyAction As Action(Of Integer),
-                IgnoreAction As Action(Of Integer),
-                EditAction As Action(Of Integer)
-                ) In ActionWithFormat
-                    If DataList(index).type = Item.Format Then
-                        Item.CopyAction(index)
-                        Exit For
-                    End If
-                Next
-                ActionSpeech(SettingsName.SpeechCopy, SpecText(LanguageTextEnum.CopySuccessfully))
-
-            Case CommandName.Ignore
-                Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                For Each Item As (
-                Format As String,
-                AddAction As Action(Of IDataObject),
-                CopyAction As Action(Of Integer),
-                IgnoreAction As Action(Of Integer),
-                EditAction As Action(Of Integer)
-                ) In ActionWithFormat
-                    If DataList(index).type = Item.Format Then
-                        Item.IgnoreAction(index)
-                        Exit For
-                    End If
-                Next
-                DataList.RemoveAt(index)
-                UpdateSeriFile()
-                ActionSpeech(SettingsName.SpeechIgnore, SpecText(LanguageTextEnum.HaveIgnored))
-
-            Case CommandName.Edit
-                Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                ActionSpeech(SettingsName.SpeechEdit, $"{SpecText(LanguageTextEnum.EditingRecent)} {NumSuffix(DataList.Count - index)} {SpecText(LanguageTextEnum.Record)}")
-
-            Case CommandName.Opacity
-                Dim opacity As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                MainForm.Opacity = opacity / 100
-
-            Case CommandName.Lock
-                Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                DataList(index).lock = Not DataList(index).lock
-                UpdateSeriFile()
-
-            Case CommandName.AddFile
-                Dim SendText As String = String.Empty
-                Dim fileOrfolder As Boolean = JsValue.Arg(jsExecState, 1).ToBoolean(jsExecState)
-                If fileOrfolder Then
-                    If AddFolderDialog.ShowDialog(MainForm) = DialogResult.OK Then
-                        SendText = AddFolderDialog.DirectoryPath
-                        SendText = If(String.IsNullOrEmpty(SendText), String.Empty, $"{SendText}{GetFileType(SendText)}")
-                    End If
-                Else
-                    If MainForm.AddFileDialog.ShowDialog() = DialogResult.OK Then
-                        Dim Temp As String() = MainForm.AddFileDialog.FileNames.Clone()
-                        For i = 0 To Temp.Length - 1
-                            Temp(i) &= GetFileType(Temp(i))
-                        Next
-                        SendText = String.Join("|", Temp)
-                    End If
-                End If
-                Return JsValue.StringValue(jsExecState, SendText)
-
-            Case Else
-
-        End Select
-
-        Return JsValue.UndefinedValue
+        Return getCommand(jsExecState, param)
     End Function
 
     Public Function getCommand3(ByVal jsExecState As IntPtr, ByVal param As IntPtr) As Long
-        '获取参数命令
-        Dim Command As CommandName = JsValue.Arg(jsExecState, 0).ToInt32(jsExecState)
-        Select Case Command
-            Case CommandName.SettingsNET
-                Dim [property] As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                Dim value As Integer = JsValue.Arg(jsExecState, 2).ToInt32(jsExecState)
-
-                Select Case [property]
-                    Case 0 To 6
-                        Settings.Speech([property]) = value
-                        WriteCore(SpeechSec, [property], value.ToString)
-                    Case 7
-                        AdjustIsTop(value)
-                    Case 8
-                        Settings.Opacity = value
-                        WriteCore(OtherSec, [property], value.ToString)
-                    Case 9
-                        Settings.Language = value
-                        SpeechMsg.Culture = New Globalization.CultureInfo(Settings.Language.ToString.Replace("_", "-"))
-                        MonitorableMenuItem.Text = $"{SpecText(LanguageTextEnum.Monitorable)}(&L)"
-                        IsTopMenuItem.Text = SpecText(LanguageTextEnum.IsTop) & "(&T)"
-                        ExitMenuItem.Text = SpecText(LanguageTextEnum.Exit) & "(&E)"
-                        MainForm.AddFileDialog.Title = SpecText(LanguageTextEnum.Add)
-                        WriteCore(OtherSec, [property], Settings.Language.ToString)
-                    Case Else
-
-                End Select
-
-            Case CommandName.EditText
-                Dim index As Integer = JsValue.Arg(jsExecState, 1).ToInt32(jsExecState)
-                Dim text As String = JsValue.Arg(jsExecState, 2).ToString(jsExecState)
-                DataList(index).text = text
-                UpdateSeriFile()
-
-            Case Else
-
-        End Select
-
-        Return JsValue.UndefinedValue
+        Return getCommand(jsExecState, param)
     End Function
 
 #End Region

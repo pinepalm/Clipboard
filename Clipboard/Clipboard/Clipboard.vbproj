@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClipboardApi.vb" />
+    <Compile Include="CmdFuncModule.vb" />
     <Compile Include="DataActionModule.vb" />
     <Compile Include="FileModule.vb" />
     <Compile Include="INIHelper.vb" />
